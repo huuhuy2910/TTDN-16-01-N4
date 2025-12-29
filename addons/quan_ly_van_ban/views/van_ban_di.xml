@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_van_ban_di_form" model="ir.ui.view">
+            <field name="name">van_ban_di.form</field>
+            <field name="model">van_ban_di</field>
+            <field name="arch" type="xml">
+                <form>
+                    <!-- Header removed: trạng thái chỉnh trong form bằng dropdown -->
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="so_van_ban" placeholder="Số văn bản"/>
+                            </h1>
+                        </div>
+                        <group col="2">
+                            <group string="Thông tin văn bản">
+                                <field name="trich_yeu"/>
+                                <field name="loai_van_ban_id"/>
+                                <field name="ngay_van_ban"/>
+                                <field name="ngay_di"/>
+                            </group>
+                            <group string="Thông tin khác">
+                                <field name="noi_nhan"/>
+                                <field name="nguoi_ky"/>
+                                <field name="so_trang"/>
+                            </group>
+                        </group>
+                        <group string="Trạng thái">
+                            <field name="trang_thai"/>
+                        </group>
+                        <group string="File đính kèm">
+                            <field name="file_dinh_kem" filename="ten_file"/>
+                            <field name="ten_file" invisible="1"/>
+                        </group>
+                        <group string="Ghi chú">
+                            <field name="ghi_chu" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_van_ban_di_tree" model="ir.ui.view">
+            <field name="name">van_ban_di.tree</field>
+            <field name="model">van_ban_di</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="so_van_ban"/>
+                    <field name="trich_yeu"/>
+                    <field name="loai_van_ban_id"/>
+                    <field name="ngay_di"/>
+                    <field name="noi_nhan"/>
+                    <field name="trang_thai"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_van_ban_di_search" model="ir.ui.view">
+            <field name="name">van_ban_di.search</field>
+            <field name="model">van_ban_di</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="so_van_ban"/>
+                    <field name="trich_yeu"/>
+                    <field name="loai_van_ban_id"/>
+                    <field name="noi_nhan"/>
+                    <filter string="Nháp" name="nhap" domain="[('trang_thai', '=', 'nhap')]"/>
+                    <filter string="Chờ duyệt" name="cho_duyet" domain="[('trang_thai', '=', 'cho_duyet')]"/>
+                    <filter string="Đã duyệt" name="da_duyet" domain="[('trang_thai', '=', 'da_duyet')]"/>
+                    <filter string="Đã gửi" name="da_gui" domain="[('trang_thai', '=', 'da_gui')]"/>
+                    <filter string="Lưu trữ" name="luu_tru" domain="[('trang_thai', '=', 'luu_tru')]"/>
+                    <group expand="0" string="Nhóm theo">
+                        <filter string="Loại văn bản" name="group_loai" context="{'group_by': 'loai_van_ban_id'}"/>
+                        <filter string="Trạng thái" name="group_trang_thai" context="{'group_by': 'trang_thai'}"/>
+                        <filter string="Ngày đi" name="group_ngay_di" context="{'group_by': 'ngay_di'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_van_ban_di" model="ir.actions.act_window">
+            <field name="name">Văn bản đi</field>
+            <field name="res_model">van_ban_di</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_van_ban_di_search"/>
+        </record>
+    </data>
+</odoo>

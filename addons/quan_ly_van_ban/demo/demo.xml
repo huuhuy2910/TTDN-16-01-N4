@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Demo data cho Loại văn bản -->
+        <record id="loai_van_ban_cong_van" model="loai_van_ban">
+            <field name="ma_loai">CV</field>
+            <field name="ten_loai">Công văn</field>
+            <field name="mo_ta">Văn bản hành chính thông thường</field>
+        </record>
+
+        <record id="loai_van_ban_quyet_dinh" model="loai_van_ban">
+            <field name="ma_loai">QD</field>
+            <field name="ten_loai">Quyết định</field>
+            <field name="mo_ta">Văn bản quyết định của lãnh đạo</field>
+        </record>
+
+        <record id="loai_van_ban_thong_bao" model="loai_van_ban">
+            <field name="ma_loai">TB</field>
+            <field name="ten_loai">Thông báo</field>
+            <field name="mo_ta">Văn bản thông báo nội bộ</field>
+        </record>
+    </data>
+</odoo>
