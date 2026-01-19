@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhan_vien_form_cham_cong" model="ir.ui.view">
+        <field name="name">nhan_vien.form.cham_cong</field>
+        <field name="model">nhan_vien</field>
+        <field name="inherit_id" ref="nhan_su.view_nhan_vien_form"/>
+        <field name="arch" type="xml">
+            <sheet position="inside">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_cham_cong" 
+                            type="object" 
+                            class="oe_stat_button" 
+                            icon="fa-calendar-check-o">
+                        <field name="so_ngay_cham_cong" widget="statinfo" string="Chấm công"/>
+                    </button>
+                </div>
+            </sheet>
+        </field>
+    </record>
+</odoo>

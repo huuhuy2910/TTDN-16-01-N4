@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu chính -->
+    <menuitem id="menu_cham_cong_root" 
+              name="Chấm Công"
+              sequence="30"/>
+
+    <!-- Menu con -->
+    <menuitem id="menu_cham_cong" 
+              name="Chấm công"
+              parent="menu_cham_cong_root"
+              action="action_cham_cong"
+              sequence="10"/>
+</odoo>

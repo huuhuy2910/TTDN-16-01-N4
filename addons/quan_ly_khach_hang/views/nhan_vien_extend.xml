@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Extend nhan_vien form để thêm smart button -->
+        <record id="view_nhan_vien_form_khach_hang" model="ir.ui.view">
+            <field name="name">nhan_vien.form.qlkh</field>
+            <field name="model">nhan_vien</field>
+            <field name="inherit_id" ref="nhan_su.view_nhan_vien_form"/>
+            <field name="arch" type="xml">
+                <!-- Thêm smart button khách hàng phụ trách -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_khach_hang" type="object" class="oe_stat_button" icon="fa-users">
+                        <field name="khach_hang_count" widget="statinfo" string="Khách hàng"/>
+                    </button>
+                    <button name="action_view_hop_dong_phu_trach" type="object" class="oe_stat_button" icon="fa-file-text">
+                        <field name="hop_dong_phu_trach_count" widget="statinfo" string="Hợp đồng"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

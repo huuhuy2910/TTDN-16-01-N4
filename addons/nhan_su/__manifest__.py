@@ -34,7 +34,7 @@
         'views/menu.xml',
     ],
     # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'demo': [],
+    'installable': True,
+    'application': True,
 }

@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_khach_hang_user,khach_hang user,model_khach_hang,base.group_user,1,1,1,1
+access_khach_hang_manager,khach_hang manager,model_khach_hang,base.group_system,1,1,1,1
+access_hop_dong_user,hop_dong user,model_hop_dong,base.group_user,1,1,1,1
+access_hop_dong_manager,hop_dong manager,model_hop_dong,base.group_system,1,1,1,1
+access_bao_gia_user,bao_gia user,model_bao_gia,base.group_user,1,1,1,1
+access_bao_gia_manager,bao_gia manager,model_bao_gia,base.group_system,1,1,1,1
+access_tai_lieu_user,tai_lieu user,model_tai_lieu,base.group_user,1,1,1,1
+access_tai_lieu_manager,tai_lieu manager,model_tai_lieu,base.group_system,1,1,1,1

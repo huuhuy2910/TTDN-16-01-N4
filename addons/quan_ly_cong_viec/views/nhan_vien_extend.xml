@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nhan_vien_form_cong_viec" model="ir.ui.view">
+        <field name="name">nhan_vien.form.cong_viec</field>
+        <field name="model">nhan_vien</field>
+        <field name="inherit_id" ref="cham_cong.view_nhan_vien_form_cham_cong"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_cong_viec" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-tasks">
+                    <field name="so_cong_viec" widget="statinfo" string="Công việc"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

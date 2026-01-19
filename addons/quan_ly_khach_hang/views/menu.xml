@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main Menu -->
+        <menuitem id="menu_qlkh_root"
+            name="Quản lý khách hàng"
+            web_icon="quan_ly_khach_hang,static/description/icon.png"
+            sequence="25"/>
+        
+        <!-- Sub Menu: Khách hàng -->
+        <menuitem id="menu_khach_hang"
+            name="Khách hàng"
+            parent="menu_qlkh_root"
+            action="action_khach_hang"
+            sequence="10"/>
+        
+        <!-- Hidden - Moved to Quan ly van ban module -->
+        <!-- <menuitem id="menu_hop_dong"
+            name="Hợp đồng"
+            parent="menu_qlkh_root"
+            action="action_hop_dong"
+            sequence="20"/> -->
+        
+        <!-- <menuitem id="menu_bao_gia"
+            name="Báo giá"
+            parent="menu_qlkh_root"
+            action="action_bao_gia"
+            sequence="30"/> -->
+        
+        <!-- <menuitem id="menu_tai_lieu"
+            name="Tài liệu số hóa"
+            parent="menu_qlkh_root"
+            action="action_tai_lieu"
+            sequence="40"/> -->
+        
+        <!-- Sub Menu: Cấu hình -->
+        <menuitem id="menu_qlkh_config"
+            name="Cấu hình"
+            parent="menu_qlkh_root"
+            sequence="100"/>
+    </data>
+</odoo>

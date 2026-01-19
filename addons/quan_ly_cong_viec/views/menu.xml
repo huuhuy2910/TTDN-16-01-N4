@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu chính -->
+    <menuitem id="menu_quan_ly_cong_viec_root" 
+              name="Quản Lý Công Việc"
+              sequence="40"/>
+
+    <!-- Menu con -->
+    <menuitem id="menu_cong_viec" 
+              name="Công việc"
+              parent="menu_quan_ly_cong_viec_root"
+              action="action_cong_viec"
+              sequence="10"/>
+              
+    <menuitem id="menu_du_an" 
+              name="Dự án"
+              parent="menu_quan_ly_cong_viec_root"
+              action="action_du_an"
+              sequence="20"/>
+</odoo>

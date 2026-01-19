@@ -34,7 +34,15 @@ class NhanVien(models.Model):
                                         store=True
                                         )
     
-    @api.depends("tuoi")
+    def action_open_van_ban_di_xu_ly(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Văn bản đi xử lý",
+            "res_model": "van_ban_di",
+            "view_mode": "tree,form",
+            "domain": [("can_bo_xu_ly_id", "=", self.id)],
+        }
     def _compute_so_nguoi_bang_tuoi(self):
         for record in self:
             if record.tuoi:

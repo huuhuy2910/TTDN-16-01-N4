@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_hop_dong_form" model="ir.ui.view">
+            <field name="name">hop_dong.form</field>
+            <field name="model">hop_dong</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_submit_for_approval" string="Gửi duyệt" type="object" 
+                                attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}" class="oe_highlight"/>
+                        <button name="action_approve" string="Duyệt" type="object" 
+                                attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}" class="oe_highlight"/>
+                        <button name="action_cancel" string="Hủy" type="object" 
+                                attrs="{'invisible': [('trang_thai', 'in', ['het_han', 'huy'])]}"/>
+                        <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,cho_duyet,hieu_luc,het_han,huy"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="ten_hop_dong" placeholder="Tên hợp đồng"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Thông tin hợp đồng">
+                                <field name="ma_hop_dong"/>
+                                <field name="khach_hang_id"/>
+                                <field name="loai_hop_dong"/>
+                                <field name="nhan_vien_phu_trach_id"/>
+                            </group>
+                            <group string="Thời hạn và giá trị">
+                                <field name="ngay_ky"/>
+                                <field name="ngay_hieu_luc"/>
+                                <field name="ngay_het_han"/>
+                                <field name="gia_tri"/>
+                                <field name="don_vi_tien"/>
+                                <field name="con_hieu_luc"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Điều khoản" name="dieu_khoan">
+                                <field name="dieu_khoan"/>
+                            </page>
+                            <page string="Mô tả" name="mo_ta">
+                                <field name="mo_ta"/>
+                            </page>
+                            <page string="File đính kèm" name="file">
+                                <group>
+                                    <field name="file_hop_dong" filename="file_hop_dong_name"/>
+                                    <field name="file_hop_dong_name" invisible="1"/>
+                                </group>
+                            </page>
+                            <page string="Tài liệu liên quan" name="tai_lieu">
+                                <field name="tai_lieu_ids">
+                                    <tree>
+                                        <field name="ma_tai_lieu"/>
+                                        <field name="ten_tai_lieu"/>
+                                        <field name="loai_tai_lieu"/>
+                                        <field name="ngay_tao"/>
+                                        <field name="trang_thai"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_hop_dong_tree" model="ir.ui.view">
+            <field name="name">hop_dong.tree</field>
+            <field name="model">hop_dong</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="trang_thai == 'het_han'" decoration-success="trang_thai == 'hieu_luc'">
+                    <field name="ma_hop_dong"/>
+                    <field name="ten_hop_dong"/>
+                    <field name="khach_hang_id"/>
+                    <field name="loai_hop_dong"/>
+                    <field name="ngay_ky"/>
+                    <field name="ngay_het_han"/>
+                    <field name="gia_tri"/>
+                    <field name="trang_thai"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_hop_dong_search" model="ir.ui.view">
+            <field name="name">hop_dong.search</field>
+            <field name="model">hop_dong</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="ma_hop_dong"/>
+                    <field name="ten_hop_dong"/>
+                    <field name="khach_hang_id"/>
+                    <field name="nhan_vien_phu_trach_id"/>
+                    <filter string="Đang hiệu lực" name="hieu_luc" domain="[('trang_thai', '=', 'hieu_luc')]"/>
+                    <filter string="Hết hạn" name="het_han" domain="[('trang_thai', '=', 'het_han')]"/>
+                    <group expand="0" string="Nhóm theo">
+                        <filter string="Khách hàng" name="group_kh" context="{'group_by': 'khach_hang_id'}"/>
+                        <filter string="Loại hợp đồng" name="group_loai" context="{'group_by': 'loai_hop_dong'}"/>
+                        <filter string="Trạng thái" name="group_tt" context="{'group_by': 'trang_thai'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_hop_dong" model="ir.actions.act_window">
+            <field name="name">Hợp đồng</field>
+            <field name="res_model">hop_dong</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_hop_dong_search"/>
+        </record>
+    </data>
+</odoo>
