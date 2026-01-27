@@ -197,7 +197,7 @@
                     <filter string="Đang thực hiện" name="dang_thuc_hien" domain="[('trang_thai', '=', 'dang_thuc_hien')]"/>
                     <filter string="Hoàn thành" name="hoan_thanh" domain="[('trang_thai', '=', 'hoan_thanh')]"/>
                     <separator/>
-                    <filter string="Giá trị cao (≥50tr)" name="high_value" domain="[('tong_gia_tri', '>=', 50000000)]"/>
+                    <filter string="Giá trị cao (≥50tr)" name="high_value" domain="[('tong_gia_tri', '&gt;=', 50000000)]"/>
                     <filter string="Tuần này" name="this_week" domain="[('ngay_dat', '>=', (context_today() - relativedelta(days=context_today().weekday())).strftime('%Y-%m-%d')), ('ngay_dat', '&lt;=', (context_today() + relativedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
                     <filter string="Tháng này" name="this_month" domain="[('ngay_dat', '>=', time.strftime('%Y-%m-01')), ('ngay_dat', '&lt;=', (datetime.date.today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
                     <group expand="0" string="Group By">

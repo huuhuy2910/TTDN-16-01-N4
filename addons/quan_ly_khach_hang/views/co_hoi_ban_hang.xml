@@ -203,8 +203,8 @@
                     <filter string="Đã thắng" name="thang" domain="[('trang_thai', '=', 'thang')]"/>
                     <filter string="Đã thua" name="thua" domain="[('trang_thai', '=', 'thua')]"/>
                     <separator/>
-                    <filter string="Xác suất cao (≥75%)" name="high_probability" domain="[('ty_le_thanh_cong', '>=', 75)]"/>
-                    <filter string="Giá trị lớn (≥100tr)" name="high_value" domain="[('gia_tri_du_kien', '>=', 100000000)]"/>
+                    <filter string="Xác suất cao (≥75%)" name="high_probability" domain="[('ty_le_thanh_cong', '&gt;=', 75)]"/>
+                    <filter string="Giá trị lớn (≥100tr)" name="high_value" domain="[('gia_tri_du_kien', '&gt;=', 100000000)]"/>
                     <separator/>
                     <filter string="Chốt tuần này" name="closing_this_week" domain="[('ngay_du_kien_chot', '>=', (context_today() - relativedelta(days=context_today().weekday())).strftime('%Y-%m-%d')), ('ngay_du_kien_chot', '&lt;=', (context_today() + relativedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
                     <filter string="Chốt tháng này" name="closing_this_month" domain="[('ngay_du_kien_chot', '>=', time.strftime('%Y-%m-01')), ('ngay_du_kien_chot', '&lt;=', (datetime.date.today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>

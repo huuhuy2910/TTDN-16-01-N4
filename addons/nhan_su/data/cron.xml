@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_sync_nhan_su_data" model="ir.cron">
+            <field name="name">Đồng bộ dữ liệu nhân sự</field>
+            <field name="model_id" ref="model_nhan_vien"/>
+            <field name="state">code</field>
+            <field name="code">model._sync_nhan_su_data()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall">0</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo></content>
+<parameter name="filePath">\\wsl.localhost\Ubuntu-22.04\home\easylove04\Business-Internship\addons\nhan_su\data\cron.xml

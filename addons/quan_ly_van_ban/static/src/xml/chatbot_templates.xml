@@ -11,6 +11,9 @@
                     <h5 class="mb-0">AI Trợ Lý Nội Bộ</h5>
                 </div>
                 <div class="o_chatbot_actions">
+                    <button class="btn btn-sm btn-light me-2" t-on-click="toggleHistory" title="Lịch sử chat">
+                        <i class="fa fa-history"></i>
+                    </button>
                     <button class="btn btn-sm btn-light me-2" t-on-click="clearHistory" title="Xóa lịch sử">
                         <i class="fa fa-trash"></i>
                     </button>
@@ -43,7 +46,7 @@
                 </t>
 
                 <!-- Chat Messages -->
-                <t t-foreach="state.messages" t-as="message" t-key="message_index">
+                <t t-foreach="state.messages" t-as="message" t-key="message.id">
                     <div t-attf-class="o_chatbot_message mb-3 d-flex {{ message.type === 'user' ? 'justify-content-end' : 'justify-content-start' }}">
                         <div t-attf-class="o_message_bubble p-3 rounded-3 {{ message.type === 'user' ? 'bg-primary text-white' : message.type === 'error' ? 'bg-danger text-white' : 'bg-white border shadow-sm' }}" style="max-width: 80%;">
                             <div class="d-flex o_message_meta">
@@ -102,6 +105,52 @@
                         </t>
                     </select>
                 </div>
+                <!-- File Upload Area -->
+                <div class="o_chatbot_file_upload mb-2">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <input
+                            type="file"
+                            class="form-control form-control-sm"
+                            t-ref="fileInput"
+                            t-on-change="onFileSelect"
+                            accept=".jpg,.jpeg,.png,.bmp,.tiff,.pdf,.docx"
+                            t-att-disabled="state.isLoading"
+                            style="display: none;"
+                        />
+                        <button
+                            class="btn btn-upload-primary btn-sm d-flex align-items-center gap-1"
+                            t-on-click="() => fileInputRef.el.click()"
+                            t-att-disabled="state.isLoading"
+                            title="Upload file để AI xử lý"
+                        >
+                            <i class="fa fa-upload"></i>
+                            <span>Upload File</span>
+                        </button>
+                        <button
+                            class="btn btn-outline-secondary btn-sm"
+                            t-on-click="() => fileInputRef.el.click()"
+                            t-att-disabled="state.isLoading"
+                            title="Chọn file đính kèm"
+                        >
+                            <i class="fa fa-paperclip"></i> Chọn file
+                        </button>
+                        <t t-if="state.uploadedFile">
+                            <div class="file-selected-indicator d-flex align-items-center gap-2">
+                                <small class="text-success mb-0">
+                                    <i class="fa fa-check-circle"></i>
+                                    <strong t-esc="state.fileName"/>
+                                </small>
+                                <button class="btn btn-sm btn-outline-danger" t-on-click="removeFile" title="Xóa file">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </t>
+                    </div>
+                    <small class="upload-info-text d-block mt-1">
+                        <i class="fa fa-info-circle me-1"></i>
+                        Hỗ trợ: JPG, PNG, BMP, TIFF, PDF, DOCX (tối đa 10MB). AI sẽ trích xuất văn bản và tạo tóm tắt.
+                    </small>
+                </div>
                 <div class="input-group">
                     <input
                         type="text"
@@ -115,7 +164,7 @@
                     <button
                         class="btn btn-primary btn-lg"
                         t-on-click="sendMessage"
-                        t-att-disabled="state.isLoading or !state.inputValue.trim()"
+                        t-att-disabled="state.isLoading or (!state.inputValue.trim() and !state.uploadedFile)"
                     >
                         <t t-if="state.isLoading">
                             <i class="fa fa-spinner fa-spin"></i>

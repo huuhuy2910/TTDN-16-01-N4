@@ -89,29 +89,11 @@
             action="action_loai_van_ban"
             sequence="1"/>
         
-        <!-- Quản trị nâng cao -->
-        <menuitem id="menu_quan_tri"
-            name="Quản trị"
-            parent="menu_qlvb_root"
-            sequence="150"/>
-        
         <menuitem id="menu_mau_van_ban"
             name="Mẫu văn bản"
-            parent="menu_quan_tri"
+            parent="menu_danh_muc"
             action="action_mau_van_ban"
-            sequence="1"/>
-        
-        <menuitem id="menu_luong_duyet"
-            name="Luồng duyệt"
-            parent="menu_quan_tri"
-            action="action_luong_duyet"
             sequence="2"/>
-        
-        <menuitem id="menu_chu_ky_dien_tu"
-            name="Chữ ký điện tử"
-            parent="menu_quan_tri"
-            action="action_chu_ky_dien_tu"
-            sequence="3"/>
         
         <!-- AI Chatbot Menu -->
         <menuitem id="menu_chatbot"
@@ -119,5 +101,11 @@
             parent="menu_qlvb_root"
             action="action_chatbot_client"
             sequence="200"/>
+        
+        <menuitem id="menu_chat_history"
+            name="Lịch sử chat"
+            parent="menu_qlvb_root"
+            action="action_chat_history"
+            sequence="210"/>
     </data>
 </odoo>

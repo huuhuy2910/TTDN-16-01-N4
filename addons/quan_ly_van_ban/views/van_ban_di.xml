@@ -8,6 +8,10 @@
             <field name="arch" type="xml">
                 <form string="Văn bản đi">
                     <header>
+                        <button name="action_extract_and_summarize" string="Trích xuất &amp; Tóm tắt" type="object" 
+                                class="btn-primary" icon="fa-magic"
+                                attrs="{'invisible': [('file_dinh_kem', '=', False)]}"
+                                help="Sử dụng AI để trích xuất và tóm tắt nội dung từ file đính kèm"/>
                         <button name="action_gui_duyet" string="Gửi duyệt" type="object" 
                             class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'du_thao')]}"/>
                         <field name="trang_thai" widget="statusbar" statusbar_visible="du_thao,cho_duyet,da_duyet,da_gui,hoan_tat"/>

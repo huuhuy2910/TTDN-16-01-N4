@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Graph View theo đơn vị -->
+        <record id="view_nhan_vien_graph_don_vi" model="ir.ui.view">
+            <field name="name">nhan_vien.graph.don_vi</field>
+            <field name="model">nhan_vien</field>
+            <field name="arch" type="xml">
+                <graph string="Nhân viên theo đơn vị" type="bar">
+                    <field name="don_vi_hien_tai" type="row"/>
+                    <field name="id" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- Graph View theo chức vụ -->
+        <record id="view_nhan_vien_graph_chuc_vu" model="ir.ui.view">
+            <field name="name">nhan_vien.graph.chuc_vu</field>
+            <field name="model">nhan_vien</field>
+            <field name="arch" type="xml">
+                <graph string="Nhân viên theo chức vụ" type="pie">
+                    <field name="chuc_vu_hien_tai" type="row"/>
+                    <field name="id" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- Graph View theo tuổi -->
+        <record id="view_nhan_vien_graph_tuoi" model="ir.ui.view">
+            <field name="name">nhan_vien.graph.tuoi</field>
+            <field name="model">nhan_vien</field>
+            <field name="arch" type="xml">
+                <graph string="Nhân viên theo tuổi" type="line">
+                    <field name="tuoi" type="row"/>
+                    <field name="id" type="measure"/>
+                </graph>
+            </field>
+        </record>
+    </data>
+</odoo>

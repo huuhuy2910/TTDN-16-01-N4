@@ -271,4 +271,52 @@ class VanBanDen(models.Model):
                 record.write({'trang_thai': 'qua_han'})
                 record.message_post(body="Cảnh báo: Văn bản đến quá hạn xử lý")
 
+    def action_extract_and_summarize(self):
+        """Trích xuất và tóm tắt nội dung văn bản từ file đính kèm"""
+        self.ensure_one()
+        
+        # Kiểm tra file đính kèm từ trường binary
+        if not self.file_dinh_kem or not self.ten_file:
+            raise models.ValidationError("Không tìm thấy file đính kèm hợp lệ (PDF, DOCX, DOC, TXT)")
+        
+        # Xác định mimetype từ tên file
+        file_name = self.ten_file.lower()
+        if file_name.endswith('.pdf'):
+            mimetype = 'application/pdf'
+        elif file_name.endswith('.docx'):
+            mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        elif file_name.endswith('.doc'):
+            mimetype = 'application/msword'
+        elif file_name.endswith('.txt'):
+            mimetype = 'text/plain'
+        else:
+            raise models.ValidationError("Loại file không được hỗ trợ. Chỉ hỗ trợ PDF, DOCX, DOC, TXT")
+        
+        try:
+            # Gọi chatbot service để xử lý file
+            result = self.env['chatbot.service'].process_uploaded_file(
+                file_data=self.file_dinh_kem,
+                file_name=self.ten_file,
+                model_key='openai_gpt4o_mini',
+                question="Hãy trích xuất nội dung chính và tóm tắt văn bản này"
+            )
+            
+            if result.get('success'):
+                # Cập nhật trích yếu với nội dung tóm tắt
+                summary = result.get('summary', result.get('answer', ''))
+                if summary:
+                    self.write({
+                        'trich_yeu': summary[:2000]  # Giới hạn 2000 ký tự
+                    })
+                    self.message_post(body=f"Đã cập nhật trích yếu từ AI:\n{summary}")
+                else:
+                    self.message_post(body="AI không thể tạo tóm tắt cho văn bản này")
+            else:
+                error_msg = result.get('error', 'Lỗi không xác định')
+                self.message_post(body=f"Lỗi khi xử lý file: {error_msg}")
+                
+        except Exception as e:
+            self.message_post(body=f"Lỗi hệ thống: {str(e)}")
+            raise
+
 

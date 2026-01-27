@@ -77,8 +77,8 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="khach_hang_id"/>
-                    <filter string="Có nợ" name="co_no" domain="[('tong_no', '>', 0)]"/>
-                    <filter string="Nợ quá hạn" name="no_qua_han" domain="[('no_qua_han', '>', 0)]"/>
+                    <filter string="Có nợ" name="co_no" domain="[('tong_no', '&gt;', 0)]"/>
+                    <filter string="Nợ quá hạn" name="no_qua_han" domain="[('no_qua_han', '&gt;', 0)]"/>
                 </search>
             </field>
         </record>

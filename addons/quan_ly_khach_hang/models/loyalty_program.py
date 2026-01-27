@@ -11,7 +11,7 @@ class ChuongTrinhKhachHangThanThiet(models.Model):
     khach_hang_id = fields.Many2one('khach_hang', string="Khách hàng", required=True, ondelete='cascade')
     
     # Tích điểm
-    tong_diem = fields.Float("Tổng điểm", default=0.0, tracking=True)
+    tong_diem = fields.Float("Tổng điểm", default=0.0)
     diem_da_su_dung = fields.Float("Điểm đã sử dụng", default=0.0)
     diem_kha_dung = fields.Float("Điểm khả dụng", compute='_compute_diem_kha_dung', store=True)
     
@@ -21,7 +21,7 @@ class ChuongTrinhKhachHangThanThiet(models.Model):
         ('bac', 'Bạc'),
         ('vang', 'Vàng'),
         ('kim_cuong', 'Kim cương'),
-    ], string="Hạng thành viên", default='dong', compute='_compute_hang_thanh_vien', store=True, tracking=True)
+    ], string="Hạng thành viên", default='dong', compute='_compute_hang_thanh_vien', store=True)
     
     # Lịch sử điểm
     lich_su_diem_ids = fields.One2many('lich_su_diem_thuong', 'chuong_trinh_id', string="Lịch sử điểm")

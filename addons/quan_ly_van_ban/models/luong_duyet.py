@@ -146,3 +146,39 @@ class LichSuDuyet(models.Model):
     def _compute_name(self):
         for record in self:
             record.name = f'{record.van_ban_type} - {record.hanh_dong} - {record.nguoi_duyet_id.name}'
+
+    def action_extract_and_summarize(self):
+        """Trích xuất và tóm tắt nội dung file đính kèm trong lịch sử duyệt"""
+        self.ensure_one()
+        
+        if not self.file_dinh_kem:
+            raise models.ValidationError("Không có file đính kèm để xử lý")
+        
+        try:
+            # Gọi chatbot service để xử lý file
+            result = self.env['chatbot.service'].process_uploaded_file(
+                file_data=self.file_dinh_kem,
+                file_name=self.file_name or 'file_attachment',
+                model_key='openai_gpt4o_mini',
+                question="Hãy trích xuất nội dung chính và tóm tắt văn bản này"
+            )
+            
+            if result.get('success'):
+                # Cập nhật ý kiến với nội dung tóm tắt
+                summary = result.get('summary', result.get('answer', ''))
+                if summary:
+                    current_y_kien = self.y_kien or ''
+                    new_y_kien = f"{current_y_kien}\n\n[Tóm tắt AI]: {summary}".strip()
+                    self.write({
+                        'y_kien': new_y_kien
+                    })
+                    self.message_post(body=f"Đã thêm tóm tắt từ AI:\n{summary}")
+                else:
+                    self.message_post(body="AI không thể tạo tóm tắt cho văn bản này")
+            else:
+                error_msg = result.get('error', 'Lỗi không xác định')
+                self.message_post(body=f"Lỗi khi xử lý file: {error_msg}")
+                
+        except Exception as e:
+            self.message_post(body=f"Lỗi hệ thống: {str(e)}")
+            raise

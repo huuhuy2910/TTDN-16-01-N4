@@ -81,6 +81,10 @@ class VanBanDi(models.Model):
     xac_nhan_chu_ky = fields.Boolean("Xác nhận chữ ký điện tử", help="Xác nhận phê duyệt bằng chữ ký điện tử")
     chu_ky_luu_id = fields.Many2one('chu.ky.dien.tu', string="Chữ ký đã lưu", help="Bản ghi chữ ký điện tử đã tạo")
     
+    # Chữ ký mới: upload ảnh
+    chu_ky_anh = fields.Binary("Ảnh chữ ký", help="Upload ảnh chữ ký từ máy")
+    ten_chu_ky_anh = fields.Char("Tên file chữ ký")
+    
     # Ghi chú
     ghi_chu = fields.Text("Ghi chú")
     
@@ -254,34 +258,35 @@ class VanBanDi(models.Model):
         self._create_approval_tasks()
     
     def action_phe_duyet_van_ban_di(self):
-        """Phê duyệt văn bản đi - yêu cầu xác nhận chữ ký điện tử"""
+        """Phê duyệt văn bản đi - yêu cầu đã ký trước khi phê duyệt"""
         self.ensure_one()
-        if not self.xac_nhan_chu_ky:
-            raise models.ValidationError("Vui lòng xác nhận chữ ký điện tử để phê duyệt văn bản đi!")
+        # Bắt buộc phải có chữ ký (đã ký hoặc đã lưu hoặc upload)
+        if not (self.da_ky_duyet or self.chu_ky_luu_id or self.chu_ky_anh):
+            raise models.ValidationError("Vui lòng upload chữ ký (PDF/ảnh) trước khi phê duyệt (bấm 'Ký').")
 
         today = fields.Date.today()
         user_nhan_vien = self.env['nhan_vien'].search([('user_id', '=', self.env.user.id)], limit=1)
-        
-        # Tạo bản ghi chữ ký điện tử
-        chu_ky = self.env['chu.ky.dien.tu'].create({
-            'van_ban_type': 'van_ban_di',
-            'van_ban_id': self.id,
-            'van_ban_ref': f'van_ban_di,{self.id}',
-            'nguoi_ky': user_nhan_vien.id if user_nhan_vien else False,
-            'chuc_vu_ky': user_nhan_vien.chuc_vu_hien_tai.ten_chuc_vu if user_nhan_vien and user_nhan_vien.chuc_vu_hien_tai else '',
-            'ngay_ky': fields.Datetime.now(),
-            'document_hash': f"HASH-{self.so_ky_hieu}-{fields.Datetime.now().timestamp()}",
-            'trang_thai': 'signed',
-            'ghi_chu': f"Phê duyệt văn bản đi: {self.so_ky_hieu}",
-        })
-        
+
+        # Nếu chưa có bản ghi chữ ký được lưu, tạo bản ghi từ chữ ký upload
+        if not self.chu_ky_luu_id:
+            chu_ky_image = False
+            if self.chu_ky_anh:
+                chu_ky_image = self.chu_ky_anh
+            if chu_ky_image:
+                chu_ky = self.env['chu.ky.dien.tu'].create_signature(
+                    'van_ban_di', self.id, user_nhan_vien.id if user_nhan_vien else False,
+                    document_content=(self.trich_yeu or self.so_ky_hieu), chu_ky_image=chu_ky_image
+                )
+                chu_ky.action_sign()
+                self.chu_ky_luu_id = chu_ky.id
+                self.da_ky_duyet = True
+                self.ngay_ky_duyet = today
+
+        # Chuyển trạng thái và thực hiện các hành động liên quan
         self.write({
             'trang_thai': 'da_gui',
-            'da_ky_duyet': True,
-            'ngay_ky_duyet': today,
-            'chu_ky_luu_id': chu_ky.id,
         })
-        
+
         # Cập nhật trạng thái văn bản đến nếu có liên kết
         if self.van_ban_den_id:
             self.van_ban_den_id.write({
@@ -292,18 +297,18 @@ class VanBanDi(models.Model):
             self.message_post(
                 body=f"Đã cập nhật trạng thái văn bản đến '{self.van_ban_den_id.so_ky_hieu}' thành 'Đã xử lý'"
             )
-        
+
         # Đề xuất cập nhật giai đoạn cơ hội bán hàng nếu có liên kết
         if self.co_hoi_id:
             self._propose_opportunity_stage_update()
-        
+
         # Gửi email thông báo đến khách hàng
         self._send_notification_email()
-        
+
         self.message_post(
-            body=f"Văn bản đã được phê duyệt với chữ ký điện tử: {chu_ky.name}"
+            body=(f"Văn bản đã được phê duyệt (Đã ký: {self.chu_ky_luu_id and self.chu_ky_luu_id.name or 'chưa rõ'})")
         )
-        self._log_approval(role='khac', action='approve', note=f"Đã duyệt với chữ ký: {chu_ky.name}")
+        self._log_approval(role='khac', action='approve', note=f"Đã duyệt")
         return {
             'type': 'ir.actions.act_window',
             'name': 'Văn bản đi',
@@ -311,6 +316,51 @@ class VanBanDi(models.Model):
             'view_mode': 'tree,form',
             'target': 'current',
             'context': {'search_default_da_gui': 1},
+        }
+
+    def action_ky_van_ban(self):
+        """Hành động Ký: tạo bản ghi chữ ký từ file upload"""
+        self.ensure_one()
+        if self.chu_ky_luu_id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {'title': 'Đã ký', 'message': 'Văn bản đã có chữ ký lưu', 'type': 'info'}
+            }
+        user_nhan_vien = self.env['nhan_vien'].search([('user_id', '=', self.env.user.id)], limit=1)
+        chu_ky_image = False
+        if self.chu_ky_anh:
+            chu_ky_image = self.chu_ky_anh
+        if not chu_ky_image:
+            raise models.ValidationError('Vui lòng upload chữ ký (PDF/ảnh) trước khi bấm Ký.')
+        chu_ky = self.env['chu.ky.dien.tu'].create_signature(
+            'van_ban_di', self.id, user_nhan_vien.id if user_nhan_vien else False,
+            document_content=(self.trich_yeu or self.so_ky_hieu), chu_ky_image=chu_ky_image
+        )
+        chu_ky.action_sign()
+        self.chu_ky_luu_id = chu_ky.id
+        self.da_ky_duyet = True
+        self.ngay_ky_duyet = fields.Date.today()
+        self.message_post(body=f"Văn bản đã được ký: {chu_ky.name}")
+        self._log_approval(role='khac', action='sign', note=f"Ký bằng ảnh: {chu_ky.name}")
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {'title': 'Ký thành công', 'message': 'Chữ ký đã được lưu', 'type': 'success'}
+        }
+
+    def action_open_signature_wizard(self):
+        """Mở wizard upload chữ ký trước khi xác nhận ký"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Upload chữ ký',
+            'res_model': 'van.ban.di.signature.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_van_ban_di_id': self.id,
+            },
         }
     
     def action_tu_choi_van_ban_di(self):
@@ -628,6 +678,55 @@ class VanBanDi(models.Model):
             )
 
 
+    def action_extract_and_summarize(self):
+        """Trích xuất và tóm tắt nội dung văn bản từ file đính kèm"""
+        self.ensure_one()
+        
+        # Kiểm tra file đính kèm từ trường binary
+        if not self.file_dinh_kem or not self.ten_file:
+            raise models.ValidationError("Không tìm thấy file đính kèm hợp lệ (PDF, DOCX, DOC, TXT)")
+        
+        # Xác định mimetype từ tên file
+        file_name = self.ten_file.lower()
+        if file_name.endswith('.pdf'):
+            mimetype = 'application/pdf'
+        elif file_name.endswith('.docx'):
+            mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        elif file_name.endswith('.doc'):
+            mimetype = 'application/msword'
+        elif file_name.endswith('.txt'):
+            mimetype = 'text/plain'
+        else:
+            raise models.ValidationError("Loại file không được hỗ trợ. Chỉ hỗ trợ PDF, DOCX, DOC, TXT")
+        
+        try:
+            # Gọi chatbot service để xử lý file
+            result = self.env['chatbot.service'].process_uploaded_file(
+                file_data=self.file_dinh_kem,
+                file_name=self.ten_file,
+                model_key='openai_gpt4o_mini',
+                question="Hãy trích xuất nội dung chính và tóm tắt văn bản này"
+            )
+            
+            if result.get('success'):
+                # Cập nhật trích yếu với nội dung tóm tắt
+                summary = result.get('summary', result.get('answer', ''))
+                if summary:
+                    self.write({
+                        'trich_yeu': summary[:2000]  # Giới hạn 2000 ký tự
+                    })
+                    self.message_post(body=f"Đã cập nhật trích yếu từ AI:\n{summary}")
+                else:
+                    self.message_post(body="AI không thể tạo tóm tắt cho văn bản này")
+            else:
+                error_msg = result.get('error', 'Lỗi không xác định')
+                self.message_post(body=f"Lỗi khi xử lý file: {error_msg}")
+                
+        except Exception as e:
+            self.message_post(body=f"Lỗi hệ thống: {str(e)}")
+            raise
+
+
 class VanBanDiApprovalLog(models.Model):
     _name = 'van_ban_di_approval_log'
     _description = 'Lịch sử duyệt văn bản đi'
@@ -641,6 +740,7 @@ class VanBanDiApprovalLog(models.Model):
     ], string='Vai trò', default='khac', required=True)
     action = fields.Selection([
         ('approve', 'Duyệt'),
+        ('sign', 'Ký'),
         ('reject', 'Từ chối'),
         ('note', 'Ghi chú'),
     ], string='Hành động', default='approve', required=True)

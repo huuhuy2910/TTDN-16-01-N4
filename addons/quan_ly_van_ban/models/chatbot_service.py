@@ -71,17 +71,30 @@ class ChatbotService(models.AbstractModel):
         if not env_key:
             raise ValueError(f"Provider không được hỗ trợ: {provider}")
 
+        # Thử đọc từ environment variable
         api_key = os.getenv(env_key, '')
-        if not api_key:
-            api_key = self._load_env_key(env_key) or ''
-        if not api_key and config_key:
+        if api_key:
+            _logger.info("Loaded %s from environment variable", env_key)
+            return api_key
+            
+        # Thử đọc từ file .env
+        api_key = self._load_env_key(env_key) or ''
+        if api_key:
+            _logger.info("Loaded %s from .env file", env_key)
+            return api_key
+            
+        # Thử đọc từ ir.config_parameter
+        if config_key:
             api_key = self.env['ir.config_parameter'].sudo().get_param(config_key, '')
-        if not api_key:
-            _logger.error(
-                "%s missing: set in environment, .env, hoặc ir.config_parameter(%s)",
-                env_key,
-                config_key,
-            )
+            if api_key:
+                _logger.info("Loaded %s from ir.config_parameter", env_key)
+                return api_key
+                
+        _logger.error(
+            "%s missing: set in environment, .env, hoặc ir.config_parameter(%s)",
+            env_key,
+            config_key,
+        )
         return api_key
 
     @api.model
@@ -715,16 +728,25 @@ class ChatbotService(models.AbstractModel):
             return []
 
     @api.model
-    def ask(self, question, model_key=None):
+    def ask(self, question, model_key=None, session_id=None, user_id=None):
         """
         Xử lý câu hỏi từ người dùng:
         1. Truy vấn dữ liệu ERP
         2. Tạo prompt với context
         3. Gọi OpenAI API
         4. Trả về câu trả lời
+        5. Lưu lịch sử chat
         """
         if not question or not question.strip():
             return {'success': False, 'error': 'Vui lòng nhập câu hỏi.'}
+        
+        # Tạo session_id nếu chưa có
+        if not session_id:
+            import uuid
+            session_id = str(uuid.uuid4())
+        
+        # Lưu tin nhắn của user
+        self._save_chat_message(session_id, question, is_bot=False, user_id=user_id)
         
         # Xác định model sẽ dùng
         selected_key = model_key or self.DEFAULT_MODEL_KEY
@@ -739,9 +761,17 @@ class ChatbotService(models.AbstractModel):
         # Lấy API key tương ứng provider
         api_key = self._get_api_key(provider)
         if not api_key:
+            error_msg = (
+                f'Chưa cấu hình API key cho {model_config["label"]}. '
+                f'Vui lòng thêm biến môi trường {provider.upper()}_API_KEY '
+                f'hoặc liên hệ quản trị viên để cấu hình.'
+            )
+            _logger.warning(error_msg)
+            # Lưu lỗi vào lịch sử
+            self._save_chat_message(session_id, error_msg, is_bot=True, message_type='system', user_id=user_id)
             return {
                 'success': False,
-                'error': 'Chưa cấu hình API key cho mô hình được chọn. Vui lòng liên hệ quản trị viên.',
+                'error': error_msg,
             }
         
         try:
@@ -764,6 +794,9 @@ class ChatbotService(models.AbstractModel):
             else:
                 raise ValueError(f"Provider không hỗ trợ: {provider}")
             
+            # Lưu câu trả lời của bot
+            self._save_chat_message(session_id, answer, is_bot=True, user_id=user_id)
+            
             # Log cho audit (không log API key)
             _logger.info(
                 "Chatbot query by user %s (model=%s): %s",
@@ -775,6 +808,7 @@ class ChatbotService(models.AbstractModel):
             return {
                 'success': True,
                 'answer': answer,
+                'session_id': session_id,
                 'context_summary': {
                     'has_overdue': bool(erp_context.get('overdue_documents')),
                     'has_monthly': bool(erp_context.get('monthly_documents')),
@@ -787,8 +821,214 @@ class ChatbotService(models.AbstractModel):
                 }
             }
         except Exception as e:
+            error_msg = f'Lỗi xử lý: {str(e)}'
             _logger.exception("Chatbot error: %s", str(e))
-            return {'success': False, 'error': f'Lỗi xử lý: {str(e)}'}
+            # Lưu lỗi vào lịch sử
+            self._save_chat_message(session_id, error_msg, is_bot=True, message_type='system', user_id=user_id)
+            return {'success': False, 'error': error_msg}
+
+    @api.model
+    def process_uploaded_file(self, file_data, file_name, model_key=None, question=None, session_id=None, user_id=None):
+        """
+        Xử lý file upload từ chatbot:
+        1. Trích xuất text từ file (PDF, DOCX, etc.)
+        2. Tóm tắt nội dung hoặc trả lời câu hỏi về file
+        3. Trả về kết quả
+        4. Lưu lịch sử chat
+        """
+        if not file_data or not file_name:
+            return {'success': False, 'error': 'Thiếu dữ liệu file hoặc tên file.'}
+
+        # Tạo session_id nếu chưa có
+        if not session_id:
+            import uuid
+            session_id = str(uuid.uuid4())
+        
+        # Lưu tin nhắn file upload
+        file_message = f"Đã upload file: {file_name}"
+        if question and question.strip():
+            file_message += f" với câu hỏi: {question}"
+        self._save_chat_message(
+            session_id,
+            file_message,
+            is_bot=False,
+            message_type='file',
+            file_name=file_name,
+            file_data=file_data,
+            user_id=user_id,
+        )
+
+        # Xác định model sẽ dùng
+        selected_key = model_key or self.DEFAULT_MODEL_KEY
+        model_config = self.SUPPORTED_MODELS.get(selected_key)
+        if not model_config:
+            _logger.warning("Model %s không được hỗ trợ, fallback default", selected_key)
+            selected_key = self.DEFAULT_MODEL_KEY
+            model_config = self.SUPPORTED_MODELS[self.DEFAULT_MODEL_KEY]
+
+        provider = model_config['provider']
+
+        # Lấy API key tương ứng provider
+        api_key = self._get_api_key(provider)
+        if not api_key:
+            error_msg = (
+                f'Chưa cấu hình API key cho {model_config["label"]}. '
+                f'Vui lòng thêm biến môi trường {provider.upper()}_API_KEY '
+                f'hoặc liên hệ quản trị viên để cấu hình.'
+            )
+            _logger.warning(error_msg)
+            # Lưu lỗi vào lịch sử
+            self._save_chat_message(session_id, error_msg, is_bot=True, message_type='system', user_id=user_id)
+            return {
+                'success': False,
+                'error': error_msg,
+            }
+
+        try:
+            # Trích xuất text từ file
+            extracted_text = self._extract_text_from_file(file_data, file_name)
+            
+            if not extracted_text:
+                error_msg = f'Không thể trích xuất text từ file {file_name}. File có thể bị hỏng hoặc không được hỗ trợ.'
+                self._save_chat_message(session_id, error_msg, is_bot=True, message_type='system', user_id=user_id)
+                return {
+                    'success': False,
+                    'error': error_msg,
+                }
+
+            # Tạo prompt cho AI
+            if question and question.strip():
+                # Người dùng có câu hỏi cụ thể về file
+                system_prompt = f"""Bạn là trợ lý AI thông minh. Người dùng đã upload file "{file_name}" và hỏi: "{question}"
+
+Nội dung file:
+{extracted_text[:4000]}  # Giới hạn 4000 ký tự để tránh vượt token limit
+
+Hãy trả lời câu hỏi của người dùng dựa trên nội dung file này. Nếu câu hỏi không liên quan đến file, hãy nói rõ."""
+                user_question = question
+            else:
+                # Không có câu hỏi cụ thể, tóm tắt file
+                system_prompt = f"""Bạn là trợ lý AI thông minh. Người dùng đã upload file "{file_name}".
+
+Nội dung file:
+{extracted_text[:4000]}  # Giới hạn 4000 ký tự
+
+Hãy tóm tắt nội dung chính của file này một cách ngắn gọn và có cấu trúc."""
+                user_question = "Hãy tóm tắt nội dung file này"
+
+            # Gọi model tương ứng
+            if provider == 'openai':
+                answer = self._call_openai(api_key, system_prompt, user_question, model_config['model_name'])
+            elif provider == 'gemini':
+                answer = self._call_gemini(
+                    api_key,
+                    system_prompt,
+                    user_question,
+                    model_config['model_name'],
+                )
+            else:
+                raise ValueError(f"Provider không hỗ trợ: {provider}")
+
+            # Lưu câu trả lời của bot
+            self._save_chat_message(session_id, answer, is_bot=True, user_id=user_id)
+
+            # Log cho audit
+            _logger.info(
+                "File processing by user %s (model=%s): %s",
+                self.env.user.login,
+                selected_key,
+                file_name
+            )
+
+            return {
+                'success': True,
+                'answer': answer,
+                'session_id': session_id,
+                'extracted_text': extracted_text[:1000],  # Trả về phần đầu để preview
+                'summary': answer,
+                'file_name': file_name,
+                'file_size': len(file_data) if file_data else 0,
+            }
+
+        except Exception as e:
+            _logger.exception("File processing error: %s", str(e))
+            return {
+                'success': False,
+                'error': f'Lỗi xử lý file: {str(e)}',
+            }
+
+    @api.model
+    def _extract_text_from_file(self, file_data, file_name):
+        """
+        Trích xuất text từ file base64.
+        Hỗ trợ: PDF, DOCX, TXT, etc.
+        """
+        try:
+            import base64
+            import io
+            
+            # Decode base64
+            file_bytes = base64.b64decode(file_data)
+            
+            # Xác định loại file từ extension
+            file_ext = file_name.lower().split('.')[-1] if '.' in file_name else ''
+            
+            if file_ext == 'pdf':
+                # Trích xuất từ PDF
+                try:
+                    # Thử import pypdf (thay thế PyPDF2)
+                    try:
+                        from pypdf import PdfReader
+                    except ImportError:
+                        from PyPDF2 import PdfReader
+                    
+                    pdf_file = io.BytesIO(file_bytes)
+                    pdf_reader = PdfReader(pdf_file)
+                    
+                    text = ""
+                    for page in pdf_reader.pages:
+                        text += page.extract_text() + "\n"
+                    
+                    return text.strip()
+                except ImportError:
+                    return "Không thể xử lý PDF: thiếu thư viện pypdf hoặc PyPDF2. Vui lòng cài đặt: pip install pypdf"
+                except Exception as e:
+                    return f"Lỗi xử lý PDF: {str(e)}"
+            
+            elif file_ext in ['docx', 'doc']:
+                # Trích xuất từ DOCX
+                try:
+                    from docx import Document
+                    docx_file = io.BytesIO(file_bytes)
+                    doc = Document(docx_file)
+                    
+                    text = ""
+                    for paragraph in doc.paragraphs:
+                        text += paragraph.text + "\n"
+                    
+                    return text.strip()
+                except ImportError:
+                    return "Không thể xử lý DOCX: thiếu thư viện python-docx. Vui lòng cài đặt: pip install python-docx"
+                except Exception as e:
+                    return f"Lỗi xử lý DOCX: {str(e)}"
+            
+            elif file_ext == 'txt':
+                # File text thuần
+                try:
+                    return file_bytes.decode('utf-8')
+                except UnicodeDecodeError:
+                    try:
+                        return file_bytes.decode('latin-1')
+                    except:
+                        return "Không thể đọc file text"
+            
+            else:
+                # File không hỗ trợ
+                return f"Loại file không được hỗ trợ: {file_ext}. Chỉ hỗ trợ PDF, DOCX, TXT."
+                
+        except Exception as e:
+            _logger.error("Text extraction error: %s", str(e))
+            return f"Lỗi trích xuất text: {str(e)}"
 
     @api.model
     def _build_system_prompt(self, erp_context):
@@ -963,6 +1203,25 @@ Không tìm thấy khách hàng tên "{cust.get('customer_name', '')}" trong h�
 """
 
         return prompt
+
+    @api.model
+    def _save_chat_message(self, session_id, message, is_bot=False, message_type='text', file_name=None, file_data=None, user_id=None):
+        """Lưu tin nhắn vào lịch sử chat"""
+        try:
+            env = self.env
+            if user_id:
+                env = env.sudo(user_id)
+            return env['chat.history'].create({
+                'session_id': session_id,
+                'message': message,
+                'is_bot': is_bot,
+                'message_type': message_type,
+                'file_name': file_name,
+                'file_data': file_data,
+            })
+        except Exception as e:
+            _logger.error("Không thể lưu lịch sử chat: %s", str(e))
+            return False
 
     @api.model
     def _call_openai(self, api_key, system_prompt, user_question, model_name):

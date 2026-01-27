@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template.nhan_su_dashboard" xml:space="preserve">
+    <t t-name="nhan_su.Dashboard" owl="1">
+        <div class="o_nhan_su_dashboard container-fluid p-4">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="text-center">Dashboard Nhân sự</h1>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Đơn vị</label>
+                        <select class="form-control" t-on-change="onDonViChange">
+                            <option value="">Tất cả</option>
+                            <t t-foreach="state.filterOptions.donVi" t-as="don_vi" t-key="don_vi.id">
+                                <option t-att-value="don_vi.id" t-esc="don_vi.ten_don_vi"/>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Chức vụ</label>
+                        <select class="form-control" t-on-change="onChucVuChange">
+                            <option value="">Tất cả</option>
+                            <t t-foreach="state.filterOptions.chucVu" t-as="chuc_vu" t-key="chuc_vu.id">
+                                <option t-att-value="chuc_vu.id" t-esc="chuc_vu.ten_chuc_vu"/>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                
+            </div>
+
+            <!-- Charts -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas t-ref="pieChart" name="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas t-ref="barChart" name="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div t-if="state.loading" class="text-center mt-4">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

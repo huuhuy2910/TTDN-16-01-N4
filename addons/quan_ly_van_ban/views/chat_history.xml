@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_chat_history_tree" model="ir.ui.view">
+            <field name="name">chat.history.tree</field>
+            <field name="model">chat.history</field>
+            <field name="arch" type="xml">
+                <tree string="Lịch sử chat" default_order="create_date desc">
+                    <field name="create_date" string="Thời gian"/>
+                    <field name="user_id" string="Người dùng"/>
+                    <field name="message_type" string="Loại"/>
+                    <field name="is_bot" string="Bot/User"/>
+                    <field name="message" string="Nội dung" widget="text"/>
+                    <field name="file_name" string="File"/>
+                    <field name="session_id" string="Session"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_chat_history_form" model="ir.ui.view">
+            <field name="name">chat.history.form</field>
+            <field name="model">chat.history</field>
+            <field name="arch" type="xml">
+                <form string="Lịch sử chat">
+                    <sheet>
+                        <group>
+                            <field name="user_id" readonly="1"/>
+                            <field name="session_id" readonly="1"/>
+                            <field name="message_type" readonly="1"/>
+                            <field name="is_bot" readonly="1"/>
+                            <field name="timestamp" readonly="1"/>
+                        </group>
+                        <group string="Nội dung">
+                            <field name="message" widget="text" readonly="1"/>
+                            <field name="file_name" readonly="1"/>
+                            <field name="file_data" filename="file_name" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_chat_history_search" model="ir.ui.view">
+            <field name="name">chat.history.search</field>
+            <field name="model">chat.history</field>
+            <field name="arch" type="xml">
+                <search string="Tìm lịch sử chat">
+                    <field name="user_id"/>
+                    <field name="message"/>
+                    <field name="session_id"/>
+                    <field name="file_name"/>
+                    <filter name="is_bot" string="Tin nhắn bot" domain="[('is_bot', '=', True)]"/>
+                    <filter name="is_user" string="Tin nhắn user" domain="[('is_bot', '=', False)]"/>
+                    <filter name="has_file" string="Có file" domain="[('file_name', '!=', False)]"/>
+                    <group expand="0" string="Nhóm theo">
+                        <filter name="group_user" string="Người dùng" context="{'group_by': 'user_id'}"/>
+                        <filter name="group_session" string="Session" context="{'group_by': 'session_id'}"/>
+                        <filter name="group_type" string="Loại" context="{'group_by': 'message_type'}"/>
+                        <filter name="group_date" string="Ngày" context="{'group_by': 'create_date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_chat_history" model="ir.actions.act_window">
+            <field name="name">Lịch sử chat</field>
+            <field name="res_model">chat.history</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_chat_history_tree"/>
+            <field name="search_view_id" ref="view_chat_history_search"/>
+            <field name="domain">[('user_id', '=', uid)]</field>
+            <field name="context">{'search_default_today': 1}</field>
+        </record>
+
+        <!-- Menu -->
+        <menuitem id="menu_chat_history"
+            name="Lịch sử chat"
+            parent="menu_qlvb_root"
+            action="action_chat_history"
+            sequence="60"/>
+    </data>
+</odoo>

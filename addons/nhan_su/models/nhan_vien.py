@@ -114,3 +114,16 @@ class NhanVien(models.Model):
     def _compute_chuc_vu_cap_do(self):
         for record in self:
             record.chuc_vu_cap_do = record.chuc_vu_hien_tai.cap_do if record.chuc_vu_hien_tai else 9999
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(NhanVien, self).create(vals_list)
+        # Trigger sync sau khi tạo
+        self._sync_nhan_su_data()
+        return records
+
+    def write(self, vals):
+        result = super(NhanVien, self).write(vals)
+        # Trigger sync sau khi update
+        self._sync_nhan_su_data()
+        return result

@@ -87,10 +87,13 @@ class ChuKyDienTu(models.Model):
             })
             # Create version in history
             if self.van_ban_ref:
+                nguoi_ky_name = False
+                if self.nguoi_ky:
+                    nguoi_ky_name = getattr(self.nguoi_ky, 'ho_va_ten', False) or getattr(self.nguoi_ky, 'ten', False)
                 self.env['lich.su.phien.ban'].create_version(
                     self.van_ban_type,
                     self.van_ban_id,
-                    f'Đã ký bởi {self.nguoi_ky.name}',
+                    f'Đã ký bởi {nguoi_ky_name or "N/A"}',
                     ghi_chu=f'Chữ ký điện tử: {self.name}'
                 )
     
@@ -159,13 +162,18 @@ class ChuKyDienTu(models.Model):
         }
         
         nguoi_ky = self.env['nhan_vien'].browse(nguoi_ky_id)
+        chuc_vu_ky = False
+        if nguoi_ky:
+            chuc_vu = getattr(nguoi_ky, 'chuc_vu_hien_tai', False)
+            if chuc_vu:
+                chuc_vu_ky = getattr(chuc_vu, 'ten_chuc_vu', False) or getattr(chuc_vu, 'name', False)
         
         vals = {
             'van_ban_type': van_ban_type,
             'van_ban_id': van_ban_id,
             'van_ban_ref': f'{model_map.get(van_ban_type)},{van_ban_id}',
             'nguoi_ky': nguoi_ky_id,
-            'chuc_vu_ky': nguoi_ky.chuc_vu,
+            'chuc_vu_ky': chuc_vu_ky,
             'document_hash': doc_hash,
             'certificate_serial': f'CERT-{fields.Datetime.now().strftime("%Y%m%d%H%M%S")}',
             'certificate_valid_from': fields.Date.today(),

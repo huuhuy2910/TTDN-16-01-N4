@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'web'],
 
     # always loaded
     'data': [
@@ -31,6 +31,8 @@
         'views/lich_su_cong_tac.xml',
         'views/chung_chi_bang_cap.xml',
         'views/danh_sach_chung_chi_bang_cap.xml',
+        'views/graph_views.xml',
+        'views/dashboard.xml',
         'views/menu.xml',
     ],
     # only loaded in demonstration mode
@@ -39,6 +41,12 @@
         'web.assets_backend': [
             'nhan_su/static/src/css/nhan_su.css',
             'nhan_su/static/src/js/nhan_su_kanban.js',
+            ('include', 'web._assets_primary_variables'),
+            'web/static/lib/Chart/Chart.js',
+            'nhan_su/static/src/js/dashboard.js',
+        ],
+        'web.assets_qweb': [
+            'nhan_su/static/src/xml/dashboard_template.xml',
         ],
     },
     'installable': True,

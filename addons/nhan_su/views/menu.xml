@@ -6,6 +6,13 @@
             name="QLNS"
             sequence="0"/>
           
+        <menuitem name="Dashboard" 
+            id="menu_dashboard" 
+            parent="menu_root" 
+            sequence="0"
+            action="action_nhan_su_dashboard_client"
+        />
+          
         <menuitem name="Quản lý nhân viên" 
             id="menu_nhan_vien" 
             parent="menu_root" 

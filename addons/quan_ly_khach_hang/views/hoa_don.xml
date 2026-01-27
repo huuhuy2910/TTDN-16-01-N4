@@ -207,12 +207,12 @@
                     <filter string="Đã thanh toán" name="da_thanh_toan" domain="[('trang_thai', '=', 'da_thanh_toan')]"/>
                     <filter string="Quá hạn" name="qua_han" domain="[('trang_thai', '=', 'qua_han')]"/>
                     <separator/>
-                    <filter string="Còn nợ" name="con_no" domain="[('con_no', '>', 0)]"/>
-                    <filter string="Chờ thanh toán" name="cho_thanh_toan" domain="[('trang_thai', '=', 'da_xuat'), ('con_no', '>', 0)]"/>
+                    <filter string="Còn nợ" name="con_no" domain="[('con_no', '&gt;', 0)]"/>
+                    <filter string="Chờ thanh toán" name="cho_thanh_toan" domain="[('trang_thai', '=', 'da_xuat'), ('con_no', '&gt;', 0)]"/>
                     <filter string="Hạn thanh toán hôm nay" name="due_today" domain="[('han_thanh_toan', '=', context_today().strftime('%Y-%m-%d')), ('trang_thai', '!=', 'da_thanh_toan')]"/>
                     <filter string="Hạn tuần này" name="due_this_week" domain="[('han_thanh_toan', '>=', (context_today() - relativedelta(days=context_today().weekday())).strftime('%Y-%m-%d')), ('han_thanh_toan', '&lt;=', (context_today() + relativedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d')), ('trang_thai', '!=', 'da_thanh_toan')]"/>
                     <separator/>
-                    <filter string="Giá trị cao (≥30tr)" name="high_value" domain="[('tong_thanh_toan', '>=', 30000000)]"/>
+                    <filter string="Giá trị cao (≥30tr)" name="high_value" domain="[('tong_thanh_toan', '&gt;=', 30000000)]"/>
                     <filter string="Xuất tháng này" name="this_month" domain="[('ngay_xuat', '>=', time.strftime('%Y-%m-01')), ('ngay_xuat', '&lt;=', (datetime.date.today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
                     <group expand="0" string="Group By">
                         <filter string="Khách hàng" name="group_khach_hang" context="{'group_by': 'khach_hang_id'}"/>
