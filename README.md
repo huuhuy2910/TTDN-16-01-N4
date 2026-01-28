@@ -20,24 +20,6 @@
 </div>
 
 ## 📖 1. Giới thiệu
-Platform ERP được áp dụng vào học phần Thực tập doanh nghiệp dựa trên mã nguồn mở Odoo. 
-
-## 🔧 2. Các công nghệ được sử dụng
-<div align="center">
-
-### Hệ điều hành
-[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
-### Công nghệ chính
-[![Odoo](https://img.shields.io/badge/Odoo-714B67?style=for-the-badge&logo=odoo&logoColor=white)](https://www.odoo.com/)
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![XML](https://img.shields.io/badge/XML-FF6600?style=for-the-badge&logo=codeforces&logoColor=white)](https://www.w3.org/XML/)
-### Cơ sở dữ liệu
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-</div>
-
-## 🚀 3. Giới thiệu hệ thống ERP
-
 **Platform ERP** là hệ thống quản trị doanh nghiệp được xây dựng trên nền tảng **Odoo (mã nguồn mở)**, phục vụ học phần *Thực tập doanh nghiệp* của Khoa Công nghệ Thông tin – Trường Đại học Đại Nam. Hệ thống được thiết kế theo mô hình ERP tích hợp, tập trung vào ba phân hệ nghiệp vụ chính: **Nhân sự – Khách hàng – Văn bản**, hướng tới mục tiêu số hóa quy trình và quản lý dữ liệu tập trung.
 
 ### Các chức năng chính của hệ thống
@@ -56,6 +38,78 @@ Platform ERP được áp dụng vào học phần Thực tập doanh nghiệp d
 
 * **Tự động hóa và hỗ trợ thông minh**
   Hỗ trợ trigger tự động (cron job, automated action), gửi email thông báo; định hướng tích hợp AI như OCR, chatbot trợ lý và tóm tắt văn bản nhằm giảm thao tác thủ công và tăng hiệu quả xử lý.
+
+---
+
+## 👥 Thành viên thực hiện
+
+| STT | Mã sinh viên | Họ và tên           | Lớp        | Nhóm        |
+| --- | ------------ | ------------------- | ---------- | ----------  |
+| 1   | 1671020139   | Nguyễn Hữu Huy      | CNTT 16-01 | Nhóm 4      |
+| 2   | 1671020041   | Nguyễn Thanh Bình   | CNTT 16-01 | Nhóm 4      |
+| 3   | 1671020182   | Đào Thị Phương Long | CNTT 16-01 | Nhóm 4      |
+
+---
+
+
+## 🔧 2. Các công nghệ được sử dụng
+<div align="center">
+
+### Hệ điều hành
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+### Công nghệ chính
+[![Odoo](https://img.shields.io/badge/Odoo-714B67?style=for-the-badge&logo=odoo&logoColor=white)](https://www.odoo.com/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![XML](https://img.shields.io/badge/XML-FF6600?style=for-the-badge&logo=codeforces&logoColor=white)](https://www.w3.org/XML/)
+### Cơ sở dữ liệu
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+</div>
+
+## 🏗️ 3. Kiến trúc hệ thống 
+
+<img width="950" height="600" alt="image" src="https://github.com/user-attachments/assets/defa47a9-a18e-4a90-be35-b073fed400a7" />
+
+---
+
+Hệ thống ERP được xây dựng trên nền tảng **Odoo**, theo mô hình **Client – Server mở rộng**, cho phép tích hợp linh hoạt với các dịch vụ bên ngoài như OCR, chữ ký số và AI.
+
+### Các thành phần chính
+
+* **Client Layer**
+  Người dùng truy cập hệ thống qua trình duyệt web (Odoo Web UI) hoặc thiết bị di động.
+
+* **Odoo Server**
+  Là trung tâm xử lý nghiệp vụ, triển khai các module ERP như:
+
+  * HRM (Quản lý nhân sự)
+  * Customer/CRM (Quản lý khách hàng, hợp đồng)
+  * Document (Quản lý văn bản, phê duyệt, ký số)
+
+* **PostgreSQL Database**
+  Lưu trữ toàn bộ dữ liệu nghiệp vụ tập trung, đảm bảo đồng bộ giữa các module.
+
+* **File Storage**
+  Lưu trữ tệp đính kèm (hợp đồng, văn bản, chữ ký), có thể sử dụng filesystem hoặc object storage.
+
+* **Integration Layer**
+  Kết nối hệ thống với các dịch vụ bên ngoài thông qua REST API, Webhook hoặc RPC.
+
+* **External Services & AI**
+
+  * OCR: Trích xuất nội dung từ tài liệu scan
+  * Digital Signature (PKI): Ký số và xác thực văn bản
+  * Notification: Gửi email/thông báo sự kiện
+  * Cloud Platform (tùy chọn): Lưu trữ và mở rộng dịch vụ
+
+### Luồng xử lý tổng quát
+
+**Client → Odoo Server → Database / File Storage → External Services**
+
+Kiến trúc này giúp hệ thống **dễ mở rộng, dễ tích hợp và phù hợp cho cả học tập lẫn triển khai thực tế**.
+
+---
+
 
 ## ⚙️ 4. Cài đặt
 
@@ -109,7 +163,7 @@ python3 odoo-bin.py -c odoo.conf -u all
 ```
 Người sử dụng truy cập theo đường dẫn _http://localhost:8069/_ để đăng nhập vào hệ thống.
 
-## 4. Nguồn tham khảo và kế thừa mã nguồn
+## 5. Nguồn tham khảo và kế thừa mã nguồn
 
 Hệ thống được xây dựng dựa trên việc **kế thừa có chọn lọc và mở rộng** từ các mã nguồn và tài nguyên sau:
 
