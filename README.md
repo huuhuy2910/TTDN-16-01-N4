@@ -67,10 +67,10 @@
 </div>
 
 ## 🏗️ 3. Kiến trúc hệ thống 
+---
 
 <img width="950" height="600" alt="image" src="https://github.com/user-attachments/assets/defa47a9-a18e-4a90-be35-b073fed400a7" />
 
----
 
 Hệ thống ERP được xây dựng trên nền tảng **Odoo**, theo mô hình **Client – Server mở rộng**, cho phép tích hợp linh hoạt với các dịch vụ bên ngoài như OCR, chữ ký số và AI.
 
@@ -110,7 +110,20 @@ Kiến trúc này giúp hệ thống **dễ mở rộng, dễ tích hợp và ph
 
 ---
 
+---
 
+## 🔄 End-to-End Flow: Số hóa hồ sơ khách hàng
+<p align="center">
+  <img src="docs/business flow/Nhom4_BusinessFlow_HeThongERPQuanLyKhachHang&VanBan.jpg" alt="End-to-End Business Flow - Digital Customer File" width="90%">
+</p>
+
+Luồng **Số hóa hồ sơ khách hàng** được lựa chọn làm luồng nghiệp vụ End-to-End vì thể hiện rõ nhất sự tích hợp giữa ba module cốt lõi của hệ thống ERP: **Nhân sự (HRM) – Quản lý khách hàng – Quản lý văn bản**.
+
+Luồng bắt đầu từ tạo hồ sơ khách hàng và hợp đồng, chuyển sang xử lý văn bản pháp lý, phê duyệt – ký điện tử và kết thúc bằng việc lưu trữ, liên kết hồ sơ số hóa. Trong toàn bộ quy trình, **HRM đóng vai trò dữ liệu gốc** để gán người phụ trách, người duyệt và người ký; hệ thống hỗ trợ **tự động hóa workflow** và **tích hợp AI/API** (OCR, chữ ký số, thông báo).
+
+
+
+---
 ## ⚙️ 4. Cài đặt
 
 ### 4.1. Cài đặt công cụ, môi trường và các thư viện cần thiết
