@@ -33,4 +33,6 @@ access_lich_su_diem_thuong_user,lich_su_diem_thuong user,model_lich_su_diem_thuo
 access_lich_su_diem_thuong_manager,lich_su_diem_thuong manager,model_lich_su_diem_thuong,base.group_system,1,1,1,1
 access_uu_dai_khach_hang_user,uu_dai_khach_hang user,model_uu_dai_khach_hang,base.group_user,1,1,1,1
 access_uu_dai_khach_hang_manager,uu_dai_khach_hang manager,model_uu_dai_khach_hang,base.group_system,1,1,1,1
+access_hop_dong_signature_wizard_user,hop_dong_signature_wizard user,model_hop_dong_signature_wizard,base.group_user,1,1,1,0
+access_giao_hang_confirm_wizard_user,giao_hang_confirm_wizard user,model_giao_hang_confirm_wizard,base.group_user,1,1,1,0
 

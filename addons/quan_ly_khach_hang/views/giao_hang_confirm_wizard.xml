@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_giao_hang_confirm_wizard_form" model="ir.ui.view">
+            <field name="name">giao_hang.confirm.wizard.form</field>
+            <field name="model">giao_hang.confirm.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Xác nhận đã giao hàng" create="false" edit="false">
+                    <sheet>
+                        <group>
+                            <field name="giao_hang_id" readonly="1" invisible="1"/>
+                            <field name="nguoi_nhan"/>
+                            <field name="nguoi_ky_nhan"/>
+                            <field name="ngay_ky_nhan"/>
+                        </group>
+                        <group string="Tải lên chữ ký" col="2">
+                            <field name="chu_ky_dien_tu" filename="chu_ky_dien_tu_name" widget="binary"/>
+                            <field name="chu_ky_dien_tu_name" invisible="1"/>
+                            <field name="preview_signature" widget="image" class="oe_avatar" attrs="{'invisible': [('preview_signature', '=', False)]}"/>
+                        </group>
+                        <group string="Tải lên ảnh xác nhận" col="2">
+                            <field name="anh_xac_nhan" filename="anh_xac_nhan_name" widget="binary"/>
+                            <field name="anh_xac_nhan_name" invisible="1"/>
+                            <field name="preview_photo" widget="image" class="oe_avatar" attrs="{'invisible': [('preview_photo', '=', False)]}"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_confirm" string="Xác nhận" type="object" class="btn-primary"/>
+                        <button string="Hủy" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

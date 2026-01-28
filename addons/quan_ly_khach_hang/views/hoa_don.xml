@@ -88,7 +88,6 @@
                     <header>
                         <button name="action_xuat_hoa_don" string="Xuất hóa đơn" type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
                         <button name="action_view_thanh_toan" string="Thanh toán" type="object" class="btn-success" attrs="{'invisible': [('trang_thai', 'in', ['nhap', 'huy', 'da_thanh_toan'])]}"/>
-                        <button name="action_check_and_clear_debt" string="Kiểm tra thanh toán" type="object" class="btn-info" attrs="{'invisible': [('thanh_toan_ids', '=', []), ('trang_thai', 'not in', ['da_xuat', 'qua_han'])]}" confirm="Bạn có chắc chắn muốn kiểm tra và xóa nợ cho hóa đơn này?"/>
                         <button name="action_huy" string="Hủy" type="object" class="btn-danger" attrs="{'invisible': [('trang_thai', 'not in', ['nhap', 'da_xuat'])]}"/>
                         <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,da_xuat,da_thanh_toan"/>
                     </header>
@@ -123,7 +122,7 @@
                                         <field name="thanh_tien" sum="Tổng"/>
                                     </tree>
                                 </field>
-                                <group class="oe_subtotal_footer oe_right">
+                                <group class="oe_subtotal_footer oe_right qlkh_invoice_totals">
                                     <div>
                                         <span>Tổng giá trị:</span>
                                         <field name="tong_gia_tri" widget="monetary"/>

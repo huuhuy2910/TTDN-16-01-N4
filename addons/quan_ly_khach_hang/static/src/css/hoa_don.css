@@ -1,0 +1,37 @@
+/* Invoice totals alignment */
+.o_form_view .qlkh_invoice_totals {
+  margin-top: 12px;
+  width: 100%;
+  max-width: 1550px;
+}
+
+.o_form_view .qlkh_invoice_totals > div {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  padding: 4px 0;
+  align-items: center;
+}
+
+.o_form_view .qlkh_invoice_totals > div > span {
+  text-align: left;
+  color: #555;
+  white-space: nowrap;
+}
+
+.o_form_view .qlkh_invoice_totals .o_field_widget {
+  text-align: right;
+  font-weight: 600;
+}
+
+.o_form_view .qlkh_invoice_totals > div:last-child {
+  border-top: 1px solid #ddd;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.o_form_view .qlkh_invoice_totals > div:last-child > span,
+.o_form_view .qlkh_invoice_totals > div:last-child .o_field_widget {
+  font-size: 15px;
+  font-weight: 700;
+}

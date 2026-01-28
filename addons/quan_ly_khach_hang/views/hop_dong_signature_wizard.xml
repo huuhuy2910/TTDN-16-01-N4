@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_hop_dong_signature_wizard_form" model="ir.ui.view">
+            <field name="name">hop_dong.signature.wizard.form</field>
+            <field name="model">hop_dong.signature.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Upload chữ ký" create="false" edit="false">
+                    <sheet>
+                        <group>
+                            <field name="hop_dong_id" readonly="1" invisible="1"/>
+                            <field name="chu_ky_hinh_anh" filename="chu_ky_hinh_anh_name" widget="binary"/>
+                            <field name="chu_ky_hinh_anh_name" invisible="1"/>
+                        </group>
+                        <group string="Xem trước" attrs="{'invisible': [('preview_image', '=', False)]}">
+                            <field name="preview_image" widget="image" class="oe_avatar"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_confirm" string="Xác nhận ký" type="object" class="btn-primary"/>
+                        <button string="Hủy" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

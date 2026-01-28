@@ -9,12 +9,12 @@
                 <form>
                     <header>
                         <button name="action_submit_for_approval" string="Gửi duyệt" type="object" 
-                                attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}" class="oe_highlight"/>
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'nhap')]}" class="oe_highlight"/>
                         <button name="action_approve" string="Duyệt" type="object" 
-                                attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}" class="oe_highlight"/>
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'cho_duyet')]}" class="oe_highlight"/>
                         <button name="action_cancel" string="Hủy" type="object" 
-                                attrs="{'invisible': [('trang_thai', 'in', ['het_han', 'huy'])]}"/>
-                        <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,cho_duyet,hieu_luc,het_han,huy"/>
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', 'in', ['het_han', 'huy'])]}"/>
+                        <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,cho_duyet,hieu_luc,het_han,huy" attrs="{'readonly': [('id', '=', False)]}"/>
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -49,6 +49,13 @@
                                 <group>
                                     <field name="file_hop_dong" filename="file_hop_dong_name"/>
                                     <field name="file_hop_dong_name" invisible="1"/>
+                                </group>
+                            </page>
+                            <page string="Chữ ký" name="chu_ky">
+                                <group>
+                                    <field name="chu_ky_hinh_anh" filename="chu_ky_hinh_anh_name" widget="image"/>
+                                    <field name="chu_ky_hinh_anh_name" invisible="1"/>
+                                    <field name="ngay_ky_xac_nhan" readonly="1"/>
                                 </group>
                             </page>
                             <page string="Tài liệu liên quan" name="tai_lieu">

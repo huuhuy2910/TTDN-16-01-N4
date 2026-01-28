@@ -19,15 +19,19 @@
     'data': [
         'security/ir.model.access.csv',
         'data/sequences.xml',
+        'data/cron.xml',
+        'views/dashboard.xml',
         'views/khach_hang.xml',
         'views/hop_dong.xml',
         'views/bao_gia.xml',
         'views/van_ban_khach_hang_menu.xml',
         'views/tai_lieu.xml',
         'views/nhan_vien_extend.xml',
+        'views/hop_dong_signature_wizard.xml',
         'views/co_hoi_ban_hang.xml',
         'views/don_hang.xml',
         'views/giao_hang.xml',
+        'views/giao_hang_confirm_wizard.xml',
         'views/hoa_don.xml',
         'views/thanh_toan.xml',
         'views/cong_no_khach_hang.xml',
@@ -38,6 +42,17 @@
     ],
 
     'demo': [],
+    'assets': {
+        'web.assets_backend': [
+            'quan_ly_khach_hang/static/src/css/qlkh_dashboard.css',
+            'quan_ly_khach_hang/static/src/css/hoa_don.css',
+            'web/static/lib/Chart/Chart.js',
+            'quan_ly_khach_hang/static/src/js/qlkh_dashboard.js',
+        ],
+        'web.assets_qweb': [
+            'quan_ly_khach_hang/static/src/xml/qlkh_dashboard_template.xml',
+        ],
+    },
     'installable': True,
     'application': True,
     'license': 'LGPL-3',

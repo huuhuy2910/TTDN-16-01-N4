@@ -11,6 +11,10 @@
         <menuitem id="menu_dashboard"
             name="Dashboard"
             parent="menu_qlvb_root"
+            action="action_qlvb_dashboard_client"
+            sequence="1"/>
+            name="Dashboard"
+            parent="menu_qlvb_root"
             action="action_van_ban_dashboard"
             sequence="1"/>
         
@@ -70,12 +74,6 @@
             action="action_bao_gia"
             sequence="2"/>
         
-        <!-- Sub Menu: Tài liệu số hóa -->
-        <menuitem id="menu_tai_lieu"
-            name="Tài liệu số hóa"
-            parent="menu_quan_ly_kinh_doanh"
-            action="action_tai_lieu"
-            sequence="3"/>
         
         <!-- Sub Menu: Danh mục -->
         <menuitem id="menu_danh_muc"
@@ -107,5 +105,11 @@
             parent="menu_qlvb_root"
             action="action_chat_history"
             sequence="210"/>
+
+        <menuitem id="menu_email_log"
+            name="Nhật ký email"
+            parent="menu_qlvb_root"
+            action="action_email_log"
+            sequence="220"/>
     </data>
 </odoo>

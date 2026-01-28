@@ -38,7 +38,7 @@ class ThanhToan(models.Model):
     ten_ngan_hang = fields.Char("Tên ngân hàng")
     so_tai_khoan = fields.Char("Số tài khoản nhận")
     chu_tai_khoan = fields.Char("Chủ tài khoản")
-    ma_giao_dich = fields.Char("Mã giao dịch", tracking=True)
+    ma_giao_dich = fields.Char("Mã giao dịch", tracking=True, default='New')
     
     # Trạng thái
     trang_thai = fields.Selection([
@@ -67,6 +67,8 @@ class ThanhToan(models.Model):
         """Tự sinh mã thanh toán khi tạo mới"""
         if vals.get('ma_thanh_toan', 'New') == 'New':
             vals['ma_thanh_toan'] = self.env['ir.sequence'].next_by_code('thanh_toan') or 'New'
+        if vals.get('ma_giao_dich', 'New') == 'New':
+            vals['ma_giao_dich'] = self.env['ir.sequence'].next_by_code('ma_giao_dich') or 'New'
         return super(ThanhToan, self).create(vals)
     
     def action_xac_nhan(self):
@@ -80,6 +82,43 @@ class ThanhToan(models.Model):
                 })
                 # Tự động cập nhật trạng thái hóa đơn
                 record._update_hoa_don_status()
+                record._send_xac_nhan_email()
+
+    def _send_xac_nhan_email(self):
+        """Gửi email khi xác nhận thanh toán (không dùng mail_templates)"""
+        self.ensure_one()
+        khach_hang = self.khach_hang_id or self.hoa_don_id.khach_hang_id
+        email_to = khach_hang.email if khach_hang else False
+        if not email_to:
+            return False
+
+        email_from = self.env.user.email_formatted or self.env.company.email or 'no-reply@example.com'
+        subject = f"Xác nhận thanh toán - Hóa đơn {self.hoa_don_id.so_hoa_don}"
+        ngay_tt = self.ngay_thanh_toan.strftime('%d/%m/%Y') if self.ngay_thanh_toan else 'Chưa xác định'
+
+        body_html = f"""
+            <p>Xin chào {khach_hang.ten_khach_hang or ''},</p>
+            <p>Thanh toán của bạn đã được xác nhận.</p>
+            <p><strong>Thông tin thanh toán:</strong></p>
+            <ul>
+                <li>Mã thanh toán: <strong>{self.ma_thanh_toan}</strong></li>
+                <li>Mã giao dịch: <strong>{self.ma_giao_dich or 'Chưa có'}</strong></li>
+                <li>Hóa đơn: <strong>{self.hoa_don_id.so_hoa_don}</strong></li>
+                <li>Số tiền: <strong>{self.so_tien}</strong></li>
+                <li>Ngày thanh toán: {ngay_tt}</li>
+                <li>Hình thức: {dict(self._fields['hinh_thuc'].selection).get(self.hinh_thuc, '')}</li>
+            </ul>
+            <p>Trân trọng.</p>
+        """
+
+        mail = self.env['mail.mail'].create({
+            'subject': subject,
+            'body_html': body_html,
+            'email_to': email_to,
+            'email_from': email_from,
+            'auto_delete': True,
+        })
+        mail.send()
     
     def _update_hoa_don_status(self):
         """Cập nhật trạng thái hóa đơn dựa trên tình trạng thanh toán"""

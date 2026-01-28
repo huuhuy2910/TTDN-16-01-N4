@@ -14,6 +14,7 @@ class HoaDon(models.Model):
     so_hoa_don = fields.Char("Số hóa đơn", required=True, copy=False, default=lambda self: self.env['ir.sequence'].next_by_code('hoa_don') or 'New')
     khach_hang_id = fields.Many2one('khach_hang', string="Khách hàng", required=True, tracking=True, ondelete='cascade')
     don_hang_id = fields.Many2one('don_hang', string="Đơn hàng liên quan", ondelete='set null')
+    giao_hang_id = fields.Many2one('giao_hang', string="Giao hàng liên quan", ondelete='set null')
     
     # Ngày tháng
     ngay_xuat = fields.Date("Ngày xuất hóa đơn", default=fields.Date.today, required=True, tracking=True)
@@ -148,22 +149,28 @@ class HoaDon(models.Model):
     
     def action_xuat_hoa_don(self):
         """Xuất hóa đơn"""
-        for record in self:
-            if record.trang_thai == 'nhap':
-                record.trang_thai = 'da_xuat'
+        self.ensure_one()
+        if self.trang_thai == 'nhap':
+            self.trang_thai = 'da_xuat'
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tạo thanh toán',
+            'res_model': 'thanh_toan',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_hoa_don_id': self.id,
+                'default_so_tien': self.con_no or self.tong_thanh_toan,
+                'default_don_vi_tien': self.don_vi_tien,
+                'default_hinh_thuc': self.hinh_thuc_thanh_toan,
+            }
+        }
     
     def action_huy(self):
         """Hủy hóa đơn"""
         for record in self:
             if record.trang_thai in ['nhap', 'da_xuat']:
                 record.trang_thai = 'huy'
-    
-    @api.model
-    def create(self, vals):
-        """Tự sinh số hóa đơn khi tạo mới"""
-        if vals.get('so_hoa_don', 'New') == 'New':
-            vals['so_hoa_don'] = self.env['ir.sequence'].next_by_code('hoa_don') or 'New'
-        return super(HoaDon, self).create(vals)
     
     def action_view_thanh_toan(self):
         """Xem danh sách thanh toán"""

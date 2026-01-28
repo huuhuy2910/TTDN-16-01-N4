@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 from datetime import date
 
 class DonHang(models.Model):
@@ -44,6 +45,7 @@ class DonHang(models.Model):
     # Liên kết
     bao_gia_id = fields.Many2one('bao_gia', string="Báo giá liên quan", ondelete='set null')
     hop_dong_id = fields.Many2one('hop_dong', string="Hợp đồng liên quan", ondelete='set null')
+    co_hoi_id = fields.Many2one('co_hoi_ban_hang', string="Cơ hội bán hàng", ondelete='set null')
     giao_hang_ids = fields.One2many('giao_hang', 'don_hang_id', string="Giao hàng")
     hoa_don_ids = fields.One2many('hoa_don', 'don_hang_id', string="Hóa đơn")
     
@@ -93,11 +95,14 @@ class DonHang(models.Model):
     def action_hoan_thanh(self):
         """Hoàn thành đơn hàng"""
         for record in self:
+            if not record.giao_hang_ids:
+                raise UserError("Cần tạo phiếu giao hàng trước khi hoàn thành đơn hàng.")
             if record.trang_thai == 'dang_thuc_hien':
                 record.write({
                     'trang_thai': 'hoan_thanh',
                     'ngay_hoan_thanh': fields.Date.today(),
                 })
+                record._send_giao_hang_email()
     
     def action_huy(self):
         """Hủy đơn hàng"""
@@ -123,6 +128,45 @@ class DonHang(models.Model):
             'domain': [('don_hang_id', '=', self.id)],
             'context': {'default_don_hang_id': self.id}
         }
+
+    def action_open_giao_hang_form(self):
+        """Mở form tạo phiếu giao hàng từ đơn hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tạo phiếu giao hàng',
+            'res_model': 'giao_hang',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_don_hang_id': self.id,
+            }
+        }
+
+    def _send_giao_hang_email(self):
+        """Gửi email thông báo chuẩn bị giao hàng (không dùng mail_templates)"""
+        self.ensure_one()
+        email_to = self.khach_hang_id.email if self.khach_hang_id else False
+        if not email_to:
+            raise UserError("Khách hàng chưa có email để gửi thông báo giao hàng.")
+
+        email_from = self.env.user.email_formatted or self.env.company.email or 'no-reply@example.com'
+        subject = f"Thông báo giao hàng cho đơn {self.ma_don_hang}"
+        body_html = f"""
+            <p>Xin chào {self.khach_hang_id.ten_khach_hang or ''},</p>
+            <p>Đơn hàng của bạn chuẩn bị được giao.</p>
+            <p>Mã đơn hàng: <strong>{self.ma_don_hang}</strong></p>
+            <p>Trân trọng.</p>
+        """
+
+        mail = self.env['mail.mail'].create({
+            'subject': subject,
+            'body_html': body_html,
+            'email_to': email_to,
+            'email_from': email_from,
+            'auto_delete': True,
+        })
+        mail.send()
     
     def action_view_hoa_don(self):
         """Xem danh sách hóa đơn"""

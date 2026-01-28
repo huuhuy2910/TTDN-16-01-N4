@@ -81,12 +81,16 @@
                 <form>
                     <header>
                         <button name="action_xac_nhan" string="Xác nhận" type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
+                        <button name="action_open_giao_hang_form" string="Tạo phiếu giao hàng" type="object" class="btn-primary"
+                            attrs="{'invisible': [('trang_thai', 'not in', ['xac_nhan', 'dang_thuc_hien'])]}"/>
                         <button name="action_bat_dau_thuc_hien" string="Bắt đầu thực hiện" type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'xac_nhan')]}"/>
-                        <button name="action_hoan_thanh" string="Hoàn thành" type="object" class="btn-success" attrs="{'invisible': [('trang_thai', '!=', 'dang_thuc_hien')]}"/>
+                        <button name="action_hoan_thanh" string="Hoàn thành" type="object" class="btn-success"
+                            attrs="{'invisible': [('trang_thai', '!=', 'dang_thuc_hien')], 'disabled': [('giao_hang_ids', '=', False)]}"/>
                         <button name="action_huy" string="Hủy" type="object" class="btn-danger" attrs="{'invisible': [('trang_thai', 'not in', ['nhap', 'xac_nhan'])]}"/>
                         <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,xac_nhan,dang_thuc_hien,hoan_thanh"/>
                     </header>
                     <sheet>
+                        <field name="giao_hang_ids" invisible="1"/>
                         <div class="oe_button_box" name="button_box">
                             <button name="action_view_giao_hang" type="object" class="oe_stat_button">
                                 <div class="o_field_widget o_stat_info">
@@ -124,6 +128,7 @@
                             <group string="Thông tin khách hàng">
                                 <field name="khach_hang_id"/>
                                 <field name="nhan_vien_phu_trach_id" widget="many2one_avatar"/>
+                                <field name="co_hoi_id"/>
                                 <field name="bao_gia_id"/>
                                 <field name="hop_dong_id"/>
                             </group>
@@ -174,6 +179,7 @@
                     <field name="ma_don_hang"/>
                     <field name="ten_don_hang"/>
                     <field name="khach_hang_id"/>
+                    <field name="co_hoi_id"/>
                     <field name="ngay_dat"/>
                     <field name="tong_gia_tri" sum="Tổng"/>
                     <field name="trang_thai" widget="badge"/>
@@ -190,6 +196,7 @@
                     <field name="ten_don_hang" string="Tên đơn hàng" filter_domain="['|', ('ten_don_hang', 'ilike', self), ('ma_don_hang', 'ilike', self)]"/>
                     <field name="khach_hang_id"/>
                     <field name="nhan_vien_phu_trach_id"/>
+                    <field name="co_hoi_id"/>
                     <separator/>
                     <filter string="Đơn hàng của tôi" name="my_orders" domain="[('nhan_vien_phu_trach_id', '=', uid)]"/>
                     <filter string="Nháp" name="nhap" domain="[('trang_thai', '=', 'nhap')]"/>
@@ -215,7 +222,7 @@
         <record id="action_don_hang" model="ir.actions.act_window">
             <field name="name">Đơn hàng</field>
             <field name="res_model">don_hang</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">tree,form,kanban</field>
             <field name="search_view_id" ref="view_don_hang_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

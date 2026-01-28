@@ -6,6 +6,12 @@
             name="Quản lý khách hàng"
             web_icon="quan_ly_khach_hang,static/description/icon.png"
             sequence="25"/>
+
+        <menuitem id="menu_qlkh_dashboard"
+            name="Dashboard"
+            parent="menu_qlkh_root"
+            action="action_qlkh_dashboard"
+            sequence="1"/>
         
         <!-- Sub Menu: Khách hàng -->
         <menuitem id="menu_khach_hang"

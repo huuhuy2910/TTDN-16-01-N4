@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template_qlvb_dashboard" xml:space="preserve">
+    <t t-name="quan_ly_van_ban.QLVBDashboard" owl="1">
+        <div class="o_qlvb_dashboard o_content container-fluid p-4">
+            <!-- Header -->
+            <div class="o_qlvb_header d-flex flex-wrap align-items-center justify-content-between mb-3">
+                <div class="o_qlvb_filters d-flex flex-wrap gap-2">
+                    <select class="form-control" t-on-change="onTimeRangeChange">
+                        <option value="">Tất cả thời gian</option>
+                        <option value="7">7 ngày gần đây</option>
+                        <option value="30">30 ngày gần đây</option>
+                        <option value="90">90 ngày gần đây</option>
+                        <option value="365">12 tháng gần đây</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-4 col-lg-2">
+                    <div class="o_qlvb_stat_card stat_primary">
+                        <div class="stat_icon"><i class="fa fa-inbox"/></div>
+                        <div class="stat_content">
+                            <div class="stat_label">VB Đến</div>
+                            <div class="stat_value" t-esc="state.summary.totalVBDen"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <div class="o_qlvb_stat_card stat_success">
+                        <div class="stat_icon"><i class="fa fa-paper-plane"/></div>
+                        <div class="stat_content">
+                            <div class="stat_label">VB Đi</div>
+                            <div class="stat_value" t-esc="state.summary.totalVBDi"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <div class="o_qlvb_stat_card stat_danger">
+                        <div class="stat_icon"><i class="fa fa-exclamation-triangle"/></div>
+                        <div class="stat_content">
+                            <div class="stat_label">Quá hạn</div>
+                            <div class="stat_value" t-esc="state.summary.totalQuaHan"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <div class="o_qlvb_stat_card stat_warning">
+                        <div class="stat_icon"><i class="fa fa-clock-o"/></div>
+                        <div class="stat_content">
+                            <div class="stat_label">Chờ duyệt</div>
+                            <div class="stat_value" t-esc="state.summary.totalChoDuyet"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <div class="o_qlvb_stat_card stat_info">
+                        <div class="stat_icon"><i class="fa fa-file-text"/></div>
+                        <div class="stat_content">
+                            <div class="stat_label">Hợp đồng</div>
+                            <div class="stat_value" t-esc="state.summary.totalHopDong"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <div class="o_qlvb_stat_card stat_purple">
+                        <div class="stat_icon"><i class="fa fa-calculator"/></div>
+                        <div class="stat_content">
+                            <div class="stat_label">Báo giá</div>
+                            <div class="stat_value" t-esc="state.summary.totalBaoGia"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card o_qlvb_card">
+                        <div class="card-body">
+                            <canvas class="o_qlvb_pie_chart" style="max-height: 280px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card o_qlvb_card">
+                        <div class="card-body">
+                            <canvas class="o_qlvb_line_chart" style="max-height: 280px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card o_qlvb_card">
+                        <div class="card-body">
+                            <h5 class="mb-3"><i class="fa fa-inbox me-2"/>Văn bản đến gần nhất</h5>
+                            <div class="table-responsive o_qlvb_table_scroll">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Số hiệu</th>
+                                            <th>Trích yếu</th>
+                                            <th>Ngày đến</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="state.recentVBDen.length === 0">
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted">Chưa có dữ liệu</td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="state.recentVBDen" t-as="item" t-key="item.id">
+                                            <tr>
+                                                <td t-esc="item.so_hieu"/>
+                                                <td class="text-truncate" style="max-width: 200px;" t-esc="item.trich_yeu"/>
+                                                <td t-esc="item.ngay_den"/>
+                                                <td><span class="badge bg-secondary" t-esc="item.trang_thai"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card o_qlvb_card">
+                        <div class="card-body">
+                            <h5 class="mb-3"><i class="fa fa-paper-plane me-2"/>Văn bản đi gần nhất</h5>
+                            <div class="table-responsive o_qlvb_table_scroll">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Số hiệu</th>
+                                            <th>Trích yếu</th>
+                                            <th>Ngày gửi</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="state.recentVBDi.length === 0">
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted">Chưa có dữ liệu</td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="state.recentVBDi" t-as="item" t-key="item.id">
+                                            <tr>
+                                                <td t-esc="item.so_hieu"/>
+                                                <td class="text-truncate" style="max-width: 200px;" t-esc="item.trich_yeu"/>
+                                                <td t-esc="item.ngay_gui"/>
+                                                <td><span class="badge bg-info" t-esc="item.trang_thai"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overdue Documents -->
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <div class="card o_qlvb_card border-danger">
+                        <div class="card-body">
+                            <h5 class="mb-3 text-danger"><i class="fa fa-exclamation-circle me-2"/>Văn bản quá hạn cần xử lý</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Số hiệu</th>
+                                            <th>Trích yếu</th>
+                                            <th>Hạn xử lý</th>
+                                            <th>Độ khẩn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="state.vbQuaHan.length === 0">
+                                            <tr>
+                                                <td colspan="4" class="text-center text-success">
+                                                    <i class="fa fa-check-circle me-2"/>Không có văn bản quá hạn
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="state.vbQuaHan" t-as="item" t-key="item.id">
+                                            <tr class="table-danger">
+                                                <td t-esc="item.so_hieu"/>
+                                                <td t-esc="item.trich_yeu"/>
+                                                <td t-esc="item.han_xu_ly"/>
+                                                <td><span class="badge bg-danger" t-esc="item.do_khan"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div t-if="state.loading" class="text-center mt-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

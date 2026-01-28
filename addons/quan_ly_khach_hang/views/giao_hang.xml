@@ -73,10 +73,14 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="action_bat_dau_van_chuyen" string="Bắt đầu vận chuyển" type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'chuan_bi')]}"/>
-                        <button name="action_xac_nhan_da_giao" string="Xác nhận đã giao" type="object" class="btn-success" attrs="{'invisible': [('trang_thai', '!=', 'dang_van_chuyen')]}"/>
-                        <button name="action_danh_dau_that_bai" string="Giao thất bại" type="object" class="btn-danger" attrs="{'invisible': [('trang_thai', '!=', 'dang_van_chuyen')]}"/>
-                        <field name="trang_thai" widget="statusbar" statusbar_visible="chuan_bi,dang_van_chuyen,da_giao"/>
+                        <button name="action_bat_dau_van_chuyen" string="Bắt đầu vận chuyển" type="object" class="btn-primary"
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'chuan_bi')]}"/>
+                        <button name="action_xac_nhan_da_giao" string="Xác nhận đã giao" type="object" class="btn-success"
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'dang_van_chuyen')]}"/>
+                        <button name="action_danh_dau_that_bai" string="Giao thất bại" type="object" class="btn-danger"
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'dang_van_chuyen')]}"/>
+                        <field name="trang_thai" widget="statusbar" statusbar_visible="chuan_bi,dang_van_chuyen,da_giao"
+                            attrs="{'invisible': [('id', '=', False)]}"/>
                     </header>
                     <sheet>
                         <div class="oe_title">

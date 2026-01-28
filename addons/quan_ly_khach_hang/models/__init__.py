@@ -15,3 +15,5 @@ from . import cong_no_khach_hang
 from . import tuong_tac_khach_hang
 from . import loyalty_program
 from . import khieu_nai_phan_hoi
+from . import hop_dong_signature_wizard
+from . import giao_hang_confirm_wizard

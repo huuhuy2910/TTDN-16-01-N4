@@ -117,8 +117,8 @@
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('view_van_ban_den_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('view_van_ban_den_form')})]"/>
-            <field name="domain">[('trang_thai', '=', 'da_xu_ly')]</field>
-            <field name="context">{'search_default_da_xu_ly': 1}</field>
+            <field name="domain">[]</field>
+            <field name="context">{'search_default_da_xu_ly': 0}</field>
         </record>
     </data>
 </odoo>

@@ -11,6 +11,7 @@ from . import khach_hang_extend
 from . import yeu_cau_khach_hang
 from . import chatbot_service
 from . import chat_history
+from . import email_log
 from . import lich_su_phien_ban
 from . import chu_ky_dien_tu
 from . import chu_ky_upload_wizard

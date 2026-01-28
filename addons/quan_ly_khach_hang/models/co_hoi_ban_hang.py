@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 from datetime import date, timedelta
 
 class CoHoiBanHang(models.Model):
@@ -59,6 +60,13 @@ class CoHoiBanHang(models.Model):
     # Liên kết
     bao_gia_ids = fields.One2many('bao_gia', 'co_hoi_id', string="Báo giá")
     bao_gia_count = fields.Integer(compute='_compute_bao_gia_count', string="Số báo giá")
+    has_bao_gia_khach_dong_y = fields.Boolean(compute='_compute_bao_gia_trang_thai', string="Có báo giá khách đồng ý")
+    has_bao_gia_khach_tu_choi = fields.Boolean(compute='_compute_bao_gia_trang_thai', string="Có báo giá khách từ chối")
+    hop_dong_ids = fields.One2many('hop_dong', 'co_hoi_id', string="Hợp đồng")
+    hop_dong_count = fields.Integer(compute='_compute_hop_dong_count', string="Số hợp đồng")
+    has_hop_dong = fields.Boolean(compute='_compute_hop_dong_count', string="Có hợp đồng")
+    don_hang_ids = fields.One2many('don_hang', 'co_hoi_id', string="Đơn hàng")
+    don_hang_count = fields.Integer(compute='_compute_don_hang_count', string="Số đơn hàng")
     
     # Thông tin bổ sung
     mo_ta = fields.Text("Mô tả cơ hội")
@@ -85,6 +93,24 @@ class CoHoiBanHang(models.Model):
     def _compute_bao_gia_count(self):
         for record in self:
             record.bao_gia_count = len(record.bao_gia_ids)
+
+    @api.depends('hop_dong_ids')
+    def _compute_hop_dong_count(self):
+        for record in self:
+            record.hop_dong_count = len(record.hop_dong_ids)
+            record.has_hop_dong = bool(record.hop_dong_ids)
+
+    @api.depends('don_hang_ids')
+    def _compute_don_hang_count(self):
+        for record in self:
+            record.don_hang_count = len(record.don_hang_ids)
+
+    @api.depends('bao_gia_ids.trang_thai')
+    def _compute_bao_gia_trang_thai(self):
+        for record in self:
+            statuses = set(record.bao_gia_ids.mapped('trang_thai'))
+            record.has_bao_gia_khach_dong_y = 'khach_dong_y' in statuses
+            record.has_bao_gia_khach_tu_choi = 'khach_tu_choi' in statuses
     
     @api.depends('giai_doan')
     def _compute_trang_thai(self):
@@ -166,27 +192,52 @@ class CoHoiBanHang(models.Model):
             'moi': 'du_dieu_kien',
             'du_dieu_kien': 'bao_gia',
             'bao_gia': 'dam_phan',
-            'dam_phan': 'thang',
         }
         for record in self:
+            if record.giai_doan == 'bao_gia' and not record.bao_gia_ids:
+                raise UserError("Cần có ít nhất một báo giá trước khi chuyển sang giai đoạn Đàm phán.")
+            if record.giai_doan == 'dam_phan':
+                if not record.hop_dong_ids:
+                    raise UserError("Cần tạo hợp đồng trước khi đánh dấu thắng/thua.")
+                raise UserError("Ở giai đoạn Đàm phán, hãy dùng nút Đánh dấu thắng/Đánh dấu thua.")
             if record.giai_doan in giai_doan_map:
                 record.giai_doan = giai_doan_map[record.giai_doan]
     
     def action_danh_dau_thang(self):
         """Đánh dấu cơ hội thắng"""
         for record in self:
+            if record.giai_doan == 'dam_phan' and not record.hop_dong_ids:
+                raise UserError("Cần tạo hợp đồng trước khi đánh dấu thắng.")
             record.write({
                 'giai_doan': 'thang',
                 'ngay_chot_thuc_te': fields.Date.today(),
             })
+            record._auto_create_don_hang_on_win()
     
     def action_danh_dau_thua(self):
         """Đánh dấu cơ hội thua"""
         for record in self:
+            if record.giai_doan == 'dam_phan' and not record.hop_dong_ids:
+                raise UserError("Cần tạo hợp đồng trước khi đánh dấu thua.")
             record.write({
                 'giai_doan': 'thua',
                 'ngay_chot_thuc_te': fields.Date.today(),
             })
+
+    def write(self, vals):
+        create_order_records = self.browse()
+        if vals.get('giai_doan') == 'thang':
+            for record in self:
+                if record.giai_doan == 'dam_phan' and not record.hop_dong_ids:
+                    raise UserError("Cần tạo hợp đồng trước khi đánh dấu thắng.")
+            create_order_records = self.filtered(lambda r: r.giai_doan == 'dam_phan')
+
+        result = super().write(vals)
+
+        if vals.get('giai_doan') == 'thang' and create_order_records:
+            create_order_records._auto_create_don_hang_on_win()
+
+        return result
     
     @api.model
     def create(self, vals):
@@ -206,3 +257,97 @@ class CoHoiBanHang(models.Model):
             'domain': [('co_hoi_id', '=', self.id)],
             'context': {'default_co_hoi_id': self.id, 'default_khach_hang_id': self.khach_hang_id.id}
         }
+
+    def action_view_hop_dong(self):
+        """Xem danh sách hợp đồng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Hợp đồng',
+            'res_model': 'hop_dong',
+            'view_mode': 'tree,form',
+            'domain': [('co_hoi_id', '=', self.id)],
+            'context': {
+                'default_co_hoi_id': self.id,
+                'default_khach_hang_id': self.khach_hang_id.id,
+                'default_nhan_vien_phu_trach_id': self.nhan_vien_phu_trach_id.id,
+            }
+        }
+
+    def action_view_don_hang(self):
+        """Xem danh sách đơn hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Đơn hàng',
+            'res_model': 'don_hang',
+            'view_mode': 'tree,form',
+            'domain': [('co_hoi_id', '=', self.id)],
+            'context': {
+                'default_co_hoi_id': self.id,
+                'default_khach_hang_id': self.khach_hang_id.id,
+                'default_nhan_vien_phu_trach_id': self.nhan_vien_phu_trach_id.id,
+            }
+        }
+
+    def action_create_hop_dong(self):
+        """Tạo hợp đồng từ cơ hội bán hàng"""
+        return self.action_open_hop_dong_form()
+
+    def action_open_hop_dong_form(self):
+        """Mở form tạo hợp đồng từ cơ hội bán hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tạo hợp đồng',
+            'res_model': 'hop_dong',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_co_hoi_id': self.id,
+                'default_khach_hang_id': self.khach_hang_id.id,
+                'default_nhan_vien_phu_trach_id': self.nhan_vien_phu_trach_id.id,
+                'default_ten_hop_dong': self.ten_co_hoi,
+                'default_gia_tri': self.gia_tri_du_kien,
+                'default_don_vi_tien': self.don_vi_tien,
+            }
+        }
+
+    def action_open_don_hang_form(self):
+        """Mở form tạo đơn hàng từ cơ hội bán hàng (không đổi trạng thái cơ hội)"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tạo đơn hàng',
+            'res_model': 'don_hang',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_co_hoi_id': self.id,
+                'default_khach_hang_id': self.khach_hang_id.id,
+                'default_nhan_vien_phu_trach_id': self.nhan_vien_phu_trach_id.id,
+                'default_ten_don_hang': f"Đơn hàng - {self.ten_co_hoi}",
+                'default_don_vi_tien': self.don_vi_tien,
+            }
+        }
+
+    def _auto_create_don_hang_on_win(self):
+        """Tự động tạo đơn hàng khi cơ hội được đánh dấu thắng"""
+        self.ensure_one()
+        existing = self.env['don_hang'].search([('co_hoi_id', '=', self.id)], limit=1)
+        if existing:
+            return existing
+
+        hop_dong = self.hop_dong_ids.sorted('id')[-1:] if self.hop_dong_ids else self.env['hop_dong']
+        bao_gia = self.bao_gia_ids.sorted('id')[-1:] if self.bao_gia_ids else self.env['bao_gia']
+
+        return self.env['don_hang'].create({
+            'ten_don_hang': f"Đơn hàng - {self.ten_co_hoi}",
+            'khach_hang_id': self.khach_hang_id.id,
+            'nhan_vien_phu_trach_id': self.nhan_vien_phu_trach_id.id,
+            'ngay_dat': fields.Date.today(),
+            'don_vi_tien': self.don_vi_tien,
+            'co_hoi_id': self.id,
+            'hop_dong_id': hop_dong.id if hop_dong else False,
+            'bao_gia_id': bao_gia.id if bao_gia else False,
+        })

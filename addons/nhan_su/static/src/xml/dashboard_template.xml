@@ -1,53 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates id="template.nhan_su_dashboard" xml:space="preserve">
     <t t-name="nhan_su.Dashboard" owl="1">
-        <div class="o_nhan_su_dashboard container-fluid p-4">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h1 class="text-center">Dashboard Nhân sự</h1>
+        <div class="o_nhan_su_dashboard o_content container-fluid p-4">
+
+            <!-- Summary Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6 col-lg-2">
+                    <div class="o_nhan_su_stat_card">
+                        <div class="stat_label">Tổng NV</div>
+                        <div class="stat_value" t-esc="state.summary.totalNhanVien"/>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-2">
+                    <div class="o_nhan_su_stat_card">
+                        <div class="stat_label">Phòng ban</div>
+                        <div class="stat_value" t-esc="state.summary.totalDonVi"/>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-2">
+                    <div class="o_nhan_su_stat_card">
+                        <div class="stat_label">Quản lý</div>
+                        <div class="stat_value" t-esc="state.summary.totalQuanLy"/>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-6">
+                    <div class="o_nhan_su_stat_card">
+                        <div class="o_nhan_su_filters d-flex flex-column gap-2">
+                            <select class="form-control" t-on-change="onDonViChange">
+                                <option value="">Tất cả phòng ban</option>
+                                <t t-foreach="state.filterOptions.donVi" t-as="don_vi" t-key="don_vi.id">
+                                    <option t-att-value="don_vi.id" t-esc="don_vi.ten_don_vi"/>
+                                </t>
+                            </select>
+                            <select class="form-control" t-on-change="onChucVuChange">
+                                <option value="">Tất cả chức vụ</option>
+                                <t t-foreach="state.filterOptions.chucVu" t-as="chuc_vu" t-key="chuc_vu.id">
+                                    <option t-att-value="chuc_vu.id" t-esc="chuc_vu.ten_chuc_vu"/>
+                                </t>
+                            </select>
+                            <select class="form-control" t-on-change="onTimeRangeChange">
+                                <option value="">Tất cả thời gian</option>
+                                <option value="30">30 ngày gần đây</option>
+                                <option value="90">90 ngày gần đây</option>
+                                <option value="180">6 tháng gần đây</option>
+                                <option value="365">12 tháng gần đây</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Filters -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>Đơn vị</label>
-                        <select class="form-control" t-on-change="onDonViChange">
-                            <option value="">Tất cả</option>
-                            <t t-foreach="state.filterOptions.donVi" t-as="don_vi" t-key="don_vi.id">
-                                <option t-att-value="don_vi.id" t-esc="don_vi.ten_don_vi"/>
-                            </t>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>Chức vụ</label>
-                        <select class="form-control" t-on-change="onChucVuChange">
-                            <option value="">Tất cả</option>
-                            <t t-foreach="state.filterOptions.chucVu" t-as="chuc_vu" t-key="chuc_vu.id">
-                                <option t-att-value="chuc_vu.id" t-esc="chuc_vu.ten_chuc_vu"/>
-                            </t>
-                        </select>
-                    </div>
-                </div>
-                
-            </div>
-
-            <!-- Charts -->
-            <div class="row">
+            <!-- Row 1 Charts -->
+            <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <div class="card">
+                    <div class="card o_nhan_su_card">
                         <div class="card-body">
-                            <canvas t-ref="pieChart" name="pieChart"></canvas>
+                            <canvas class="o_nhan_su_pie_chart" t-ref="pieChart" style="max-height: 320px;"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card">
+                    <div class="card o_nhan_su_card">
                         <div class="card-body">
-                            <canvas t-ref="barChart" name="barChart"></canvas>
+                            <canvas class="o_nhan_su_bar_chart" t-ref="barChart" style="max-height: 320px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card o_nhan_su_card">
+                        <div class="card-body">
+                            <canvas class="o_nhan_su_dept_bar_chart" t-ref="deptBarChart" style="max-height: 320px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card o_nhan_su_card">
+                        <div class="card-body">
+                            <h5 class="mb-3">Nhân sự mới / cập nhật gần đây</h5>
+                            <div class="table-responsive o_nhan_su_recent_table">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên</th>
+                                            <th>Phòng ban</th>
+                                            <th>Chức vụ</th>
+                                            <th>Ngày vào</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="state.recentNhanVien.length === 0">
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted">Chưa có dữ liệu</td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="state.recentNhanVien" t-as="nv" t-key="nv.id">
+                                            <tr>
+                                                <td t-esc="nv.ho_va_ten"/>
+                                                <td t-esc="nv.don_vi_hien_tai"/>
+                                                <td t-esc="nv.chuc_vu_hien_tai"/>
+                                                <td t-esc="nv.ngay_vao"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

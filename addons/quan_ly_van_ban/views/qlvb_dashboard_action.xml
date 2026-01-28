@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Dashboard Client Action -->
+        <record id="action_qlvb_dashboard_client" model="ir.actions.client">
+            <field name="name">Dashboard Văn bản</field>
+            <field name="tag">quan_ly_van_ban.qlvb_dashboard</field>
+        </record>
+    </data>
+</odoo>

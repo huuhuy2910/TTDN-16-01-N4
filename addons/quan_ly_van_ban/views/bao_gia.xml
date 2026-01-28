@@ -9,12 +9,12 @@
                 <form>
                     <header>
                         <button name="action_send_to_customer" string="Gửi khách" type="object" 
-                                attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}" class="oe_highlight"/>
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'nhap')]}" class="oe_highlight"/>
                         <button name="action_customer_approve" string="Khách đồng ý" type="object" 
-                                attrs="{'invisible': [('trang_thai', '!=', 'gui_khach')]}" class="oe_highlight"/>
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'gui_khach')]}" class="oe_highlight"/>
                         <button name="action_customer_reject" string="Khách từ chối" type="object" 
-                                attrs="{'invisible': [('trang_thai', '!=', 'gui_khach')]}" class="btn-danger"/>
-                        <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,gui_khach,khach_dong_y,khach_tu_choi,het_han"/>
+                            attrs="{'invisible': ['|', ('id', '=', False), ('trang_thai', '!=', 'gui_khach')]}" class="btn-danger"/>
+                        <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,gui_khach,khach_dong_y,khach_tu_choi,het_han" attrs="{'readonly': [('id', '=', False)]}"/>
                     </header>
                     <sheet>
                         <div class="oe_title">

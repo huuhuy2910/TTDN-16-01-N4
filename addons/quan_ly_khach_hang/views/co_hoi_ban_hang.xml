@@ -87,12 +87,20 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="action_chuyen_giai_doan_tiep" string="Chuyển giai đoạn tiếp" type="object" class="btn-primary" attrs="{'invisible': [('giai_doan', 'in', ['thang', 'thua'])]}"/>
-                        <button name="action_danh_dau_thang" string="Đánh dấu thắng" type="object" class="btn-success" attrs="{'invisible': [('giai_doan', 'in', ['thang', 'thua'])]}"/>
-                        <button name="action_danh_dau_thua" string="Đánh dấu thua" type="object" class="btn-danger" attrs="{'invisible': [('giai_doan', 'in', ['thang', 'thua'])]}"/>
+                        <button name="action_chuyen_giai_doan_tiep" string="Chuyển giai đoạn tiếp" type="object" class="btn-primary"
+                            attrs="{'invisible': ['|', ('id', '=', False), ('giai_doan', 'in', ['dam_phan', 'thang', 'thua'])]}"/>
+                        <button name="action_open_hop_dong_form" string="Tạo hợp đồng" type="object" class="btn-primary"
+                            attrs="{'invisible': ['|', ('id', '=', False), ('giai_doan', '!=', 'dam_phan')]}"/>
+                        <button name="action_danh_dau_thang" string="Đánh dấu thắng" type="object" class="btn-success"
+                            attrs="{'invisible': ['|', ('id', '=', False), ('giai_doan', '!=', 'dam_phan')], 'disabled': [('has_hop_dong', '=', False)]}"/>
+                        <button name="action_danh_dau_thua" string="Đánh dấu thua" type="object" class="btn-danger"
+                            attrs="{'invisible': ['|', ('id', '=', False), ('giai_doan', '!=', 'dam_phan')], 'disabled': [('has_hop_dong', '=', False)]}"/>
                         <field name="giai_doan" widget="statusbar" statusbar_visible="moi,du_dieu_kien,bao_gia,dam_phan,thang"/>
                     </header>
                     <sheet>
+                        <field name="has_bao_gia_khach_dong_y" invisible="1"/>
+                        <field name="has_bao_gia_khach_tu_choi" invisible="1"/>
+                        <field name="has_hop_dong" invisible="1"/>
                         <div class="oe_button_box" name="button_box">
                             <button name="action_view_bao_gia" type="object" class="oe_stat_button">
                                 <div class="o_field_widget o_stat_info">
@@ -102,12 +110,20 @@
                                     <span class="o_stat_text">Báo giá</span>
                                 </div>
                             </button>
-                            <button name="%(action_don_hang)d" type="action" class="oe_stat_button" context="{'default_khach_hang_id': khach_hang_id}">
+                            <button name="action_view_don_hang" type="object" class="oe_stat_button">
                                 <div class="o_field_widget o_stat_info">
                                     <span class="o_stat_value">
-                                        <i class="fa fa-shopping-cart" title="Tạo đơn hàng"/>
+                                        <field name="don_hang_count"/>
                                     </span>
-                                    <span class="o_stat_text">Tạo đơn hàng</span>
+                                    <span class="o_stat_text">Đơn hàng</span>
+                                </div>
+                            </button>
+                            <button name="action_view_hop_dong" type="object" class="oe_stat_button">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="hop_dong_count"/>
+                                    </span>
+                                    <span class="o_stat_text">Hợp đồng</span>
                                 </div>
                             </button>
                         </div>
@@ -151,6 +167,17 @@
                                         <field name="ten_bao_gia"/>
                                         <field name="ngay_tao"/>
                                         <field name="tong_gia_tri"/>
+                                        <field name="trang_thai"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Hợp đồng" name="hop_dong">
+                                <field name="hop_dong_ids">
+                                    <tree>
+                                        <field name="ma_hop_dong"/>
+                                        <field name="ten_hop_dong"/>
+                                        <field name="ngay_ky"/>
+                                        <field name="gia_tri"/>
                                         <field name="trang_thai"/>
                                     </tree>
                                 </field>
@@ -224,7 +251,7 @@
         <record id="action_co_hoi_ban_hang" model="ir.actions.act_window">
             <field name="name">Cơ hội bán hàng</field>
             <field name="res_model">co_hoi_ban_hang</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">tree,form,kanban</field>
             <field name="search_view_id" ref="view_co_hoi_ban_hang_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

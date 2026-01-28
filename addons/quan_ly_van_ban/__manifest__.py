@@ -49,21 +49,27 @@
         'views/mau_van_ban.xml',
         'views/luong_duyet.xml',
         'views/dashboard.xml',
+        'views/qlvb_dashboard_action.xml',
         'views/approval_views.xml',
         'views/khach_hang_extend.xml',
         'views/yeu_cau_khach_hang.xml',
         'views/chatbot_action.xml',
         'views/chat_history.xml',
+        'views/email_log.xml',
         'views/menu.xml',
         'data/cron.xml',
     ],
     'assets': {
         'web.assets_qweb': [
             'quan_ly_van_ban/static/src/xml/chatbot_templates.xml',
+            'quan_ly_van_ban/static/src/xml/qlvb_dashboard_template.xml',
         ],
         'web.assets_backend': [
             'quan_ly_van_ban/static/src/css/chatbot.css',
+            'quan_ly_van_ban/static/src/css/qlvb_dashboard.css',
+            'web/static/lib/Chart/Chart.js',
             'quan_ly_van_ban/static/src/js/chatbot_dialog.js',
+            'quan_ly_van_ban/static/src/js/qlvb_dashboard.js',
         ],
     },
     # only loaded in demonstration mode

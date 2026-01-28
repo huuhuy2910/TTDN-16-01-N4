@@ -38,6 +38,78 @@
   align-items: center;
 }
 
+/* ============================================
+   DASHBOARD UI
+   ============================================ */
+.o_nhan_su_dashboard h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.o_action_manager .o_nhan_su_dashboard {
+  overflow-y: auto;
+  max-height: calc(100vh - 90px);
+  padding-bottom: 24px;
+}
+
+.o_nhan_su_filters .form-control {
+  min-width: 180px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.o_nhan_su_stat_card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid #eef2f7;
+  height: 100%;
+}
+
+.o_nhan_su_stat_card .stat_label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.o_nhan_su_stat_card .stat_value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 6px;
+}
+
+.o_nhan_su_recent_table {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.o_nhan_su_card {
+  border-radius: 14px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.o_nhan_su_alerts {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.o_nhan_su_alerts li {
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #374151;
+}
+
 .nhan_vien_kanban_rows .o_kanban_counter {
   font-size: 13px;
   color: #6b7280;

@@ -46,6 +46,15 @@
             <field name="number_increment">1</field>
         </record>
 
+        <!-- Sequence cho Mã giao dịch -->
+        <record id="seq_ma_giao_dich" model="ir.sequence">
+            <field name="name">Mã giao dịch</field>
+            <field name="code">ma_giao_dich</field>
+            <field name="prefix">GD</field>
+            <field name="padding">6</field>
+            <field name="number_increment">1</field>
+        </record>
+
         <!-- Sequence cho Khiếu nại -->
         <record id="seq_khieu_nai_phan_hoi" model="ir.sequence">
             <field name="name">Khiếu nại phản hồi</field>
@@ -54,5 +63,23 @@
             <field name="padding">5</field>
             <field name="number_increment">1</field>
         </record>
+
+            <!-- Sequence cho Báo giá -->
+            <record id="seq_bao_gia" model="ir.sequence">
+                <field name="name">Báo giá</field>
+                <field name="code">bao_gia</field>
+                <field name="prefix">BG</field>
+                <field name="padding">5</field>
+                <field name="number_increment">1</field>
+            </record>
+
+            <!-- Sequence cho Hợp đồng -->
+            <record id="seq_hop_dong" model="ir.sequence">
+                <field name="name">Hợp đồng</field>
+                <field name="code">hop_dong</field>
+                <field name="prefix">HD</field>
+                <field name="padding">5</field>
+                <field name="number_increment">1</field>
+            </record>
     </data>
 </odoo>

@@ -39,9 +39,9 @@
     'demo': [],
     'assets': {
         'web.assets_backend': [
+            ('include', 'web._assets_primary_variables'),
             'nhan_su/static/src/css/nhan_su.css',
             'nhan_su/static/src/js/nhan_su_kanban.js',
-            ('include', 'web._assets_primary_variables'),
             'web/static/lib/Chart/Chart.js',
             'nhan_su/static/src/js/dashboard.js',
         ],

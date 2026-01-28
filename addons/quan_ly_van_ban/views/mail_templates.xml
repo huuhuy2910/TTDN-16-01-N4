@@ -58,5 +58,4 @@
             <field name="auto_delete" eval="False"/>
         </record>
     </data>
-</odoo></content>
-<parameter name="filePath">\\wsl.localhost\Ubuntu-22.04\home\easylove04\Business-Internship\addons\quan_ly_van_ban\views\mail_templates.xml
+</odoo>

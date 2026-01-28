@@ -32,3 +32,5 @@ access_buoc_duyet_manager,buoc_duyet manager,model_buoc_duyet,base.group_system,
 access_lich_su_duyet_user,lich_su_duyet user,model_lich_su_duyet,base.group_user,1,0,0,0
 access_lich_su_duyet_manager,lich_su_duyet manager,model_lich_su_duyet,base.group_system,1,1,1,1
 access_van_ban_dashboard_user,van_ban_dashboard user,model_van_ban_dashboard,base.group_user,1,0,1,0
+access_email_log_user,email_log user,model_qlvb_email_log,base.group_user,1,0,0,0
+access_email_log_manager,email_log manager,model_qlvb_email_log,base.group_system,1,1,1,1

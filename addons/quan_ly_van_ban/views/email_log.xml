@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_email_log_tree" model="ir.ui.view">
+            <field name="name">qlvb.email.log.tree</field>
+            <field name="model">qlvb.email.log</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="status == 'failed'" decoration-success="status == 'sent'">
+                    <field name="sent_date"/>
+                    <field name="subject"/>
+                    <field name="email_to"/>
+                    <field name="model_name"/>
+                    <field name="res_name"/>
+                    <field name="status" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_email_log_form" model="ir.ui.view">
+            <field name="name">qlvb.email.log.form</field>
+            <field name="model">qlvb.email.log</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="status" widget="badge"/>
+                                <field name="sent_date"/>
+                                <field name="template_xmlid"/>
+                            </group>
+                            <group>
+                                <field name="email_from"/>
+                                <field name="email_to"/>
+                                <field name="subject"/>
+                            </group>
+                        </group>
+                        <group string="Liên kết">
+                            <field name="model_name"/>
+                            <field name="res_id"/>
+                            <field name="res_name"/>
+                            <field name="mail_id"/>
+                        </group>
+                        <group string="Chi tiết lỗi" attrs="{'invisible': [('status', '!=', 'failed')]}">
+                            <field name="error_message"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_email_log_search" model="ir.ui.view">
+            <field name="name">qlvb.email.log.search</field>
+            <field name="model">qlvb.email.log</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="subject"/>
+                    <field name="email_to"/>
+                    <field name="model_name"/>
+                    <filter string="Đã gửi" name="sent" domain="[('status', '=', 'sent')]"/>
+                    <filter string="Thất bại" name="failed" domain="[('status', '=', 'failed')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Trạng thái" name="group_status" context="{'group_by': 'status'}"/>
+                        <filter string="Model" name="group_model" context="{'group_by': 'model_name'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_email_log" model="ir.actions.act_window">
+            <field name="name">Nhật ký email</field>
+            <field name="res_model">qlvb.email.log</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_email_log_search"/>
+        </record>
+    </data>
+</odoo>

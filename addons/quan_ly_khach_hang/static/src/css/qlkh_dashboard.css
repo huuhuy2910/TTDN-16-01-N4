@@ -1,0 +1,70 @@
+/* CRM Dashboard */
+.o_qlkh_dashboard {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: 100% !important;
+  max-height: calc(100vh - 50px) !important;
+}
+
+.o_qlkh_dashboard h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.o_qlkh_filters .form-control {
+  min-width: 190px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.o_qlkh_stat_card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid #eef2f7;
+  height: 100%;
+}
+
+.o_qlkh_stat_card .stat_label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.o_qlkh_stat_card .stat_value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 6px;
+}
+
+.o_qlkh_card {
+  border-radius: 14px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.o_qlkh_table_scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.o_qlkh_alerts {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.o_qlkh_alerts li {
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #374151;
+}
